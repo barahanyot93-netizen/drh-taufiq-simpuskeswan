@@ -324,8 +324,8 @@
         <li class="nav-item" data-page="vaksinasi"><span class="ic">🦠</span> Vaksinasi</li>
         <li class="nav-item" id="nav-stokobat" data-page="stokobat"><span class="ic">💊</span> Stok Obat</li>
         <li class="nav-item" id="nav-stokalkeswan" data-page="stokalkeswan"><span class="ic">🧰</span> Stok Alkeswan</li>
-        <li class="nav-item" data-page="laporan"><span class="ic">📊</span> Laporan</li>
-        <li class="nav-item" data-page="rekappkh"><span class="ic">📋</span> Rekap PKH</li>
+        <li class="nav-item" data-page="laporan"><span class="ic">📊</span> Laporan Layanan Keswan/Petugas</li>
+        <li class="nav-item" data-page="rekappkh"><span class="ic">📋</span> Laporan PKH & Rekap</li>
         <li class="nav-item" id="nav-petugas" data-page="petugas" style="display:none;"><span class="ic">👥</span> Data Petugas</li>
         <li class="nav-item" id="nav-pengaturan" data-page="pengaturan" style="display:none;"><span class="ic">⚙️</span> Pengaturan</li>
       </ul>
@@ -887,6 +887,30 @@
             <button class="btn btn-accent btn-sm" id="btn-perbaiki-peternak">🔧 Tetapkan Pembuat</button>
             <div id="hasil-perbaiki-peternak" style="margin-top:12px; font-size:12.5px; line-height:1.6;"></div>
           </div>
+
+          <div class="panel" style="max-width:460px;" id="panel-gabung-akun">
+            <h3>Gabungkan Akun Duplikat</h3>
+            <p style="font-size:12.5px; color:var(--text-muted); margin:0 0 14px;">
+              Pakai ini kalau satu petugas ternyata punya <b>dua akun/UID berbeda</b> (misalnya pernah daftar ulang), sehingga data lamanya terpisah di dua identitas. Semua data Peternak, Ternak, Pelayanan & Vaksinasi milik akun lama akan dipindah kepemilikannya ke akun yang benar.
+            </p>
+            <div class="field" style="margin-bottom:10px;">
+              <label>UID Akun Duplikat (lama)</label>
+              <input id="inp-gabung-dari-uid" placeholder="Tempel UID di sini (lihat cara ambilnya di bawah)">
+              <p style="font-size:11.5px; color:var(--text-muted); margin:6px 0 0;">
+                Kalau akun lama sudah terlanjur dihapus dari Data Petugas, UID-nya masih bisa diambil dari data lama: buka Firebase Console &rarr; Firestore &rarr; koleksi <code>pelayanan</code> atau <code>vaksinasi</code> &rarr; buka salah satu dokumen milik petugas tersebut &rarr; salin nilai field <code>createdBy</code>, tempel di sini.
+              </p>
+            </div>
+            <div class="field" style="margin-bottom:10px;">
+              <label>Akun yang Benar (tujuan, dipakai sekarang)</label>
+              <select id="sel-gabung-ke"><option value="">Pilih petugas...</option></select>
+            </div>
+            <div class="field" style="display:flex; align-items:center; gap:8px; margin-bottom:14px;">
+              <input type="checkbox" id="chk-nonaktifkan-lama" checked style="width:auto;">
+              <label style="margin:0;">Nonaktifkan akun duplikat setelah digabung</label>
+            </div>
+            <button class="btn btn-accent btn-sm" id="btn-gabung-akun">🔗 Gabungkan Sekarang</button>
+            <div id="hasil-gabung-akun" style="margin-top:12px; font-size:12.5px; line-height:1.6;"></div>
+          </div>
         </div>
 
       </div>
@@ -1033,6 +1057,8 @@ function terapkanBatasanRole(){
   if(panelPerbaiki) panelPerbaiki.style.display = isAdminUser ? 'block' : 'none';
   const panelPerbaikiPeternak = document.getElementById('panel-perbaiki-peternak');
   if(panelPerbaikiPeternak) panelPerbaikiPeternak.style.display = isAdminUser ? 'block' : 'none';
+  const panelGabungAkun = document.getElementById('panel-gabung-akun');
+  if(panelGabungAkun) panelGabungAkun.style.display = isAdminUser ? 'block' : 'none';
 
   // menu Data Petugas hanya untuk Admin
   const navPetugas = document.getElementById('nav-petugas');
@@ -1186,8 +1212,8 @@ const pageTitles = {
   vaksinasi:['Vaksinasi','Catatan kegiatan vaksinasi ternak'],
   stokobat:['Stok Obat','Kelola stok obat (dengan tanggal kadaluarsa)'],
   stokalkeswan:['Stok Alkeswan','Kelola stok alat kesehatan hewan'],
-  laporan:['Laporan','Rekap data berdasarkan periode'],
-  rekappkh:['Rekap PKH','Rekapitulasi kegiatan pelayanan keswan per Kecamatan/Gampong'],
+  laporan:['Laporan Layanan Keswan/Petugas','Rekap data berdasarkan periode'],
+  rekappkh:['Laporan PKH & Rekap','Rekapitulasi kegiatan pelayanan keswan per Kecamatan/Gampong'],
   petugas:['Data Petugas','Kelola akun dan akses petugas'],
   pengaturan:['Pengaturan','Kelola profil akun Anda'],
 };
@@ -1605,17 +1631,17 @@ function fieldDetailPelayananHtml(p={}, jenisLayananAktif=''){
   return `
     ${ownerPickerHtml('2', p)}
     ${isKonsultasi ? '' : `
-    <div class="field"><label>Anamnesa / Keluhan Pemilik</label>
+    <div class="field"><label>Anamnesa / Keluhan Pemilik <span style="color:var(--danger);">*</span></label>
       <input id="f-anamnesa" value="${escapeHtml(p.anamnesa)}" placeholder="Keluhan/riwayat yang disampaikan pemilik sebelum diperiksa">
     </div>`}
-    <div class="field"><label>${isKonsultasi ? 'Jenis Konsultasi' : 'Jenis Penyakit / Diagnosa (jika ada)'}</label>
+    <div class="field"><label>${isKonsultasi ? 'Jenis Konsultasi' : 'Jenis Penyakit / Diagnosa'} <span style="color:var(--danger);">*</span></label>
       <input id="f-jenispenyakit" value="${escapeHtml(p.jenisPenyakit)}" placeholder="${isKonsultasi ? 'Contoh: Konsultasi Gizi, Reproduksi, Manajemen Kandang' : 'Contoh: Scabies, Diare, Cacingan, dll'}">
     </div>
     ${isKonsultasi ? '' : `
-    <div class="field"><label>Terapi / Obat yang Diberikan</label>
+    <div class="field"><label>Terapi / Obat yang Diberikan <span style="color:var(--danger);">*</span></label>
       <input id="f-terapi" value="${escapeHtml(p.terapi)}" placeholder="Contoh: Ivermectin, Antibiotik, Vitamin B Kompleks">
     </div>`}
-    <div class="field"><label>Jenis Hewan</label>
+    <div class="field"><label>Jenis Hewan <span style="color:var(--danger);">*</span></label>
       <select id="f-jenisternak">
         <option value="">Pilih jenis</option>
         ${JENIS_HEWAN.map(j=>`<option ${p.jenisTernak===j?'selected':''}>${j}</option>`).join('')}
@@ -1678,6 +1704,15 @@ document.getElementById('btn-add-pelayanan').addEventListener('click', ()=>{
         petugasRole: currentProfile?.role || 'Admin',
         createdBy: currentUser.uid,
       };
+      if(jenis !== 'Konsultasi'){
+        if(!data.anamnesa){ showToast('Anamnesa/Keluhan wajib diisi, lengkapi data terlebih dahulu', true); return; }
+        if(!data.jenisPenyakit){ showToast('Jenis Penyakit/Diagnosa wajib diisi, lengkapi data terlebih dahulu', true); return; }
+        if(!data.terapi){ showToast('Terapi/Obat yang diberikan wajib diisi, lengkapi data terlebih dahulu', true); return; }
+      }else{
+        if(!data.jenisPenyakit){ showToast('Jenis Konsultasi wajib diisi, lengkapi data terlebih dahulu', true); return; }
+      }
+      if(!data.jenisTernak){ showToast('Jenis Hewan wajib dipilih, lengkapi data terlebih dahulu', true); return; }
+      if(!data.jumlahTernak){ showToast('Jumlah Hewan wajib diisi, lengkapi data terlebih dahulu', true); return; }
     }
     await db.collection('pelayanan').add(data);
     showToast('Data pelayanan tersimpan');
@@ -1717,6 +1752,15 @@ window.editPelayanan = function(id){
         tanggal: new Date(document.getElementById('f-tglpelayanan').value),
         catatan: document.getElementById('f-catatan').value.trim(),
       };
+      if(jenis !== 'Konsultasi'){
+        if(!data.anamnesa){ showToast('Anamnesa/Keluhan wajib diisi, lengkapi data terlebih dahulu', true); return; }
+        if(!data.jenisPenyakit){ showToast('Jenis Penyakit/Diagnosa wajib diisi, lengkapi data terlebih dahulu', true); return; }
+        if(!data.terapi){ showToast('Terapi/Obat yang diberikan wajib diisi, lengkapi data terlebih dahulu', true); return; }
+      }else{
+        if(!data.jenisPenyakit){ showToast('Jenis Konsultasi wajib diisi, lengkapi data terlebih dahulu', true); return; }
+      }
+      if(!data.jenisTernak){ showToast('Jenis Hewan wajib dipilih, lengkapi data terlebih dahulu', true); return; }
+      if(!data.jumlahTernak){ showToast('Jumlah Hewan wajib diisi, lengkapi data terlebih dahulu', true); return; }
     }
     await db.collection('pelayanan').doc(id).update(data);
     showToast('Data pelayanan diperbarui');
@@ -2085,6 +2129,12 @@ function initPetugasListener(){
       const terpilih = selPerbaikiPeternak.value;
       selPerbaikiPeternak.innerHTML = '<option value="">Pilih petugas...</option>' +
         petugasCache.map(p=>`<option value="${p.id}" ${p.id===terpilih?'selected':''}>${escapeHtml(p.nama)} (${escapeHtml(p.role)})</option>`).join('');
+    }
+    const selGabungKe = document.getElementById('sel-gabung-ke');
+    if(selGabungKe){
+      const terpilih = selGabungKe.value;
+      selGabungKe.innerHTML = '<option value="">Pilih petugas...</option>' +
+        petugasCache.map(p=>`<option value="${p.id}" ${p.id===terpilih?'selected':''}>${escapeHtml(p.nama)} (${escapeHtml(p.email)})</option>`).join('');
     }
   }, err=> showToast('Gagal memuat data petugas: '+err.message, true));
 }
@@ -3227,6 +3277,58 @@ document.getElementById('btn-perbaiki-peternak').addEventListener('click', async
     showToast('Gagal menjalankan penetapan: ' + err.message, true);
   }finally{
     btn.disabled = false; btn.textContent = '🔧 Tetapkan Pembuat';
+  }
+});
+
+document.getElementById('btn-gabung-akun').addEventListener('click', async ()=>{
+  const uidDari = document.getElementById('inp-gabung-dari-uid').value.trim();
+  const uidKe = document.getElementById('sel-gabung-ke').value;
+  const nonaktifkanLama = document.getElementById('chk-nonaktifkan-lama').checked;
+  const hasilBox = document.getElementById('hasil-gabung-akun');
+  if(!uidDari){ showToast('Tempel UID akun duplikat (lama) terlebih dahulu', true); return; }
+  if(!uidKe){ showToast('Pilih akun tujuan terlebih dahulu', true); return; }
+  if(uidDari === uidKe){ showToast('Akun duplikat dan akun tujuan tidak boleh sama', true); return; }
+  const petugasDariDikenal = petugasCache.find(p=>p.id===uidDari);
+  const petugasKe = petugasCache.find(p=>p.id===uidKe);
+  const labelDari = petugasDariDikenal ? `${petugasDariDikenal.nama} (${petugasDariDikenal.email})` : `UID ${uidDari} (akun ini sudah tidak ada di Data Petugas)`;
+  if(!confirm(`Pindahkan SEMUA data (Peternak, Ternak, Pelayanan, Vaksinasi) milik "${labelDari}" ke "${petugasKe?.nama||'-'} (${petugasKe?.email||'-'})"?\n\nTindakan ini tidak bisa dibatalkan otomatis.`)) return;
+  const btn = document.getElementById('btn-gabung-akun');
+  btn.disabled = true; btn.textContent = 'Menggabungkan...';
+  hasilBox.innerHTML = 'Sedang memindahkan data...';
+  try{
+    const hasilPerKoleksi = {};
+    for(const namaKoleksi of ['peternak','ternak','pelayanan','vaksinasi']){
+      const snap = await db.collection(namaKoleksi).where('createdBy','==',uidDari).get();
+      let opsCount = 0;
+      const semuaBatch = [db.batch()];
+      snap.forEach(doc=>{
+        let batchAktif = semuaBatch[semuaBatch.length-1];
+        batchAktif.update(doc.ref, {createdBy: uidKe});
+        opsCount++;
+        if(opsCount >= 400){ semuaBatch.push(db.batch()); opsCount = 0; }
+      });
+      for(const b of semuaBatch){ await b.commit(); }
+      hasilPerKoleksi[namaKoleksi] = snap.size;
+    }
+    if(nonaktifkanLama && petugasDariDikenal){
+      await db.collection('petugas').doc(uidDari).update({aktif:false});
+    }
+    const totalDipindah = Object.values(hasilPerKoleksi).reduce((a,b)=>a+b,0);
+    hasilBox.innerHTML = `
+      ✅ Data berhasil dipindahkan ke <b>${escapeHtml(petugasKe?.nama||'-')}</b>:<br>
+      &nbsp;&nbsp;• Peternak: ${hasilPerKoleksi.peternak} data<br>
+      &nbsp;&nbsp;• Ternak: ${hasilPerKoleksi.ternak} data<br>
+      &nbsp;&nbsp;• Pelayanan: ${hasilPerKoleksi.pelayanan} data<br>
+      &nbsp;&nbsp;• Vaksinasi: ${hasilPerKoleksi.vaksinasi} data<br>
+      ${totalDipindah===0 ? '⚠️ Tidak ada data yang ditemukan dengan UID itu — cek lagi apakah UID yang ditempel sudah benar (salin persis dari field createdBy).<br>' : ''}
+      ${petugasDariDikenal ? (nonaktifkanLama ? '✅ Akun duplikat sudah dinonaktifkan.' : 'ℹ️ Akun duplikat masih aktif (tidak dinonaktifkan sesuai pilihan Bapak).') : 'ℹ️ Akun lama sudah tidak ada di Data Petugas, jadi tidak perlu dinonaktifkan lagi.'}
+    `;
+    showToast('Penggabungan akun selesai dijalankan');
+  }catch(err){
+    hasilBox.innerHTML = '';
+    showToast('Gagal menggabungkan akun: ' + err.message, true);
+  }finally{
+    btn.disabled = false; btn.textContent = '🔗 Gabungkan Sekarang';
   }
 });
 
