@@ -327,6 +327,7 @@
         <li class="nav-item" data-page="laporan"><span class="ic">📊</span> Laporan Layanan Keswan/Petugas</li>
         <li class="nav-item" data-page="rekappkh"><span class="ic">📋</span> Laporan PKH & Rekap</li>
         <li class="nav-item" id="nav-petugas" data-page="petugas" style="display:none;"><span class="ic">👥</span> Data Petugas</li>
+        <li class="nav-item" id="nav-auditlog" data-page="auditlog" style="display:none;"><span class="ic">🛡️</span> Log Aktivitas</li>
         <li class="nav-item" id="nav-pengaturan" data-page="pengaturan" style="display:none;"><span class="ic">⚙️</span> Pengaturan</li>
       </ul>
       <div class="sidebar-foot">
@@ -826,6 +827,28 @@
           </div>
         </div>
 
+        <!-- LOG AKTIVITAS (khusus Admin) -->
+        <div class="page" id="page-auditlog">
+          <div class="panel">
+            <div class="section-head">
+              <h3>Log Aktivitas</h3>
+              <button class="btn btn-ghost btn-sm" id="btn-muat-auditlog">🔄 Muat Ulang</button>
+            </div>
+            <p style="font-size:12.5px; color:var(--text-muted); margin:-6px 0 16px;">
+              Catatan otomatis siapa menambah/mengubah/menghapus data apa dan kapan. Log ini tidak bisa diubah atau dihapus siapa pun lewat aplikasi — murni untuk ditelusuri kalau ada data yang berubah tidak semestinya.
+            </p>
+            <div class="table-wrap">
+              <table>
+                <thead><tr><th>Waktu</th><th>Petugas</th><th>Aksi</th><th>Koleksi</th><th>Keterangan</th></tr></thead>
+                <tbody id="table-auditlog"><tr><td class="empty-row" colspan="5">Klik "Muat Ulang" untuk menampilkan log</td></tr></tbody>
+              </table>
+            </div>
+            <div style="text-align:center; margin-top:14px;">
+              <button class="btn btn-ghost btn-sm" id="btn-lebih-auditlog" style="display:none;">Muat 100 Lagi</button>
+            </div>
+          </div>
+        </div>
+
         <!-- PENGATURAN -->
         <div class="page" id="page-pengaturan">
           <div class="panel" style="max-width:460px;">
@@ -996,6 +1019,27 @@ function escapeHtml(val){
     .replace(/"/g, '&quot;')
     .replace(/'/g, '&#039;');
 }
+// Mencatat jejak aktivitas (audit log): siapa, kapan, aksi apa, pada data mana.
+// Dipanggil setelah setiap tambah/ubah/hapus data penting. Log ini tidak bisa
+// diubah/dihapus siapa pun lewat aplikasi (lihat firestore.rules) - khusus
+// Admin yang bisa membacanya di menu Log Aktivitas.
+async function catatAudit(aksi, koleksi, docId, ringkasan){
+  try{
+    await db.collection('audit_log').add({
+      waktu: firebase.firestore.FieldValue.serverTimestamp(),
+      uid: currentUser?.uid || '-',
+      nama: currentProfile?.nama || currentUser?.email || '-',
+      email: currentUser?.email || '-',
+      aksi, // 'tambah' | 'ubah' | 'hapus'
+      koleksi,
+      docId: docId || '-',
+      ringkasan: ringkasan || '-'
+    });
+  }catch(err){
+    // Jangan sampai gagal mencatat log menggagalkan aksi utama pengguna
+    console.warn('Gagal mencatat audit log:', err.message);
+  }
+}
 function roleBadge(role){
   if(role === 'Medik Veteriner') return `<span class="badge badge-vet">Dokter Hewan</span>`;
   if(role === 'Paramedik Veteriner') return `<span class="badge badge-para">Paramedik Veteriner</span>`;
@@ -1065,6 +1109,8 @@ function terapkanBatasanRole(){
   if(navPetugas) navPetugas.style.display = isAdminUser ? 'flex' : 'none';
   const navPengaturan = document.getElementById('nav-pengaturan');
   if(navPengaturan) navPengaturan.style.display = isAdminUser ? 'flex' : 'none';
+  const navAuditLog = document.getElementById('nav-auditlog');
+  if(navAuditLog) navAuditLog.style.display = isAdminUser ? 'flex' : 'none';
   if(isAdminUser){ initPetugasListener(); initPetugasPendingListener(); }
 }
 
@@ -1215,12 +1261,13 @@ const pageTitles = {
   laporan:['Laporan Layanan Keswan/Petugas','Rekap data berdasarkan periode'],
   rekappkh:['Laporan PKH & Rekap','Rekapitulasi kegiatan pelayanan keswan per Kecamatan/Gampong'],
   petugas:['Data Petugas','Kelola akun dan akses petugas'],
+  auditlog:['Log Aktivitas','Jejak siapa mengubah data apa dan kapan'],
   pengaturan:['Pengaturan','Kelola profil akun Anda'],
 };
 document.querySelectorAll('.nav-item').forEach(item=>{
   item.addEventListener('click', ()=>{
     const p = item.dataset.page;
-    if((p === 'petugas' || p === 'pengaturan') && !isAdminUser){
+    if((p === 'petugas' || p === 'pengaturan' || p === 'auditlog') && !isAdminUser){
       showToast('Halaman ini khusus Admin', true);
       return;
     }
@@ -1335,7 +1382,8 @@ document.getElementById('btn-add-peternak').addEventListener('click', ()=>{
       createdBy: currentUser.uid
     };
     if(!data.nama){ showToast('Nama wajib diisi', true); return; }
-    await db.collection('peternak').add(data);
+    const refBaru = await db.collection('peternak').add(data);
+    catatAudit('tambah', 'peternak', refBaru.id, `Menambahkan pemilik "${data.nama}"`);
     showToast('Pemilik berhasil ditambahkan');
     closeModal();
   });
@@ -1344,13 +1392,15 @@ window.editPeternak = function(id){
   const p = peternakCache.find(x=>x.id===id);
   if(!(isAdminUser || bolehAksesStok || p.createdBy === currentUser.uid)){ showToast('Anda tidak berhak mengubah data ini', true); return; }
   openModal('Edit Pemilik', peternakFormHtml(p), async ()=>{
+    const namaBaru = document.getElementById('f-nama').value.trim();
     await db.collection('peternak').doc(id).update({
-      nama: document.getElementById('f-nama').value.trim(),
+      nama: namaBaru,
       nik: document.getElementById('f-nik').value.trim(),
       desa: document.getElementById('f-desa').value.trim(),
       kecamatan: document.getElementById('f-kecamatan').value.trim(),
       noHp: document.getElementById('f-nohp').value.trim(),
     });
+    catatAudit('ubah', 'peternak', id, `Mengubah data pemilik "${namaBaru}" (sebelumnya "${p.nama}")`);
     showToast('Data pemilik diperbarui');
     closeModal();
   });
@@ -1361,6 +1411,7 @@ window.deletePeternak = async function(id){
   if(!confirm('Hapus data pemilik ini?')) return;
   try{
     await db.collection('peternak').doc(id).delete();
+    catatAudit('hapus', 'peternak', id, `Menghapus pemilik "${p?.nama||'-'}"`);
     showToast('Data pemilik dihapus');
   }catch(err){
     showToast('Gagal menghapus: ' + err.message, true);
@@ -1506,7 +1557,8 @@ document.getElementById('btn-add-ternak').addEventListener('click', ()=>{
       createdBy: currentUser.uid
     };
     if(!data.jenis){ showToast('Jenis ternak wajib dipilih', true); return; }
-    await db.collection('ternak').add(data);
+    const refBaru = await db.collection('ternak').add(data);
+    catatAudit('tambah', 'ternak', refBaru.id, `Menambahkan data ternak "${data.jenis}" (${data.jumlah} ekor) milik ${data.namaPeternak||'-'}`);
     showToast('Data hewan ditambahkan');
     closeModal();
   });
@@ -1515,12 +1567,14 @@ window.editTernak = function(id){
   const t = ternakCache.find(x=>x.id===id);
   if(!(isAdminUser || bolehAksesStok || t.createdBy === currentUser.uid)){ showToast('Anda tidak berhak mengubah data ini', true); return; }
   openModal('Edit Data Ternak', ternakFormHtml(t), async ()=>{
+    const jenisBaru = document.getElementById('f-jenis').value;
     await db.collection('ternak').doc(id).update({
-      jenis: document.getElementById('f-jenis').value,
+      jenis: jenisBaru,
       jumlah: Number(document.getElementById('f-jumlah').value)||0,
       namaPeternak: document.getElementById('f-peternak').value,
       tanggalData: new Date(document.getElementById('f-tanggal').value),
     });
+    catatAudit('ubah', 'ternak', id, `Mengubah data ternak "${jenisBaru}" milik ${t.namaPeternak||'-'}`);
     showToast('Data hewan diperbarui');
     closeModal();
   });
@@ -1531,6 +1585,7 @@ window.deleteTernak = async function(id){
   if(!confirm('Hapus data ternak ini?')) return;
   try{
     await db.collection('ternak').doc(id).delete();
+    catatAudit('hapus', 'ternak', id, `Menghapus data ternak "${t?.jenis||'-'}" milik ${t?.namaPeternak||'-'}`);
     showToast('Data hewan dihapus');
   }catch(err){
     showToast('Gagal menghapus: ' + err.message, true);
@@ -1714,7 +1769,8 @@ document.getElementById('btn-add-pelayanan').addEventListener('click', ()=>{
       if(!data.jenisTernak){ showToast('Jenis Hewan wajib dipilih, lengkapi data terlebih dahulu', true); return; }
       if(!data.jumlahTernak){ showToast('Jumlah Hewan wajib diisi, lengkapi data terlebih dahulu', true); return; }
     }
-    await db.collection('pelayanan').add(data);
+    const refBaru = await db.collection('pelayanan').add(data);
+    catatAudit('tambah', 'pelayanan', refBaru.id, `Menambahkan pelayanan "${data.jenisLayanan}" untuk ${data.namaPeternak||data.namaKegiatan||'-'}`);
     showToast('Data pelayanan tersimpan');
     closeModal();
   });
@@ -1763,6 +1819,7 @@ window.editPelayanan = function(id){
       if(!data.jumlahTernak){ showToast('Jumlah Hewan wajib diisi, lengkapi data terlebih dahulu', true); return; }
     }
     await db.collection('pelayanan').doc(id).update(data);
+    catatAudit('ubah', 'pelayanan', id, `Mengubah pelayanan "${data.jenisLayanan}" untuk ${data.namaPeternak||data.namaKegiatan||'-'}`);
     showToast('Data pelayanan diperbarui');
     closeModal();
   });
@@ -1774,6 +1831,7 @@ window.deletePelayanan = async function(id){
   if(!confirm('Hapus data pelayanan ini?')) return;
   try{
     await db.collection('pelayanan').doc(id).delete();
+    catatAudit('hapus', 'pelayanan', id, `Menghapus pelayanan "${p?.jenisLayanan||'-'}" untuk ${p?.namaPeternak||p?.namaKegiatan||'-'}`);
     showToast('Data pelayanan dihapus');
   }catch(err){
     showToast('Gagal menghapus: ' + err.message, true);
@@ -1869,7 +1927,8 @@ document.getElementById('btn-add-vaksinasi').addEventListener('click', ()=>{
       petugasRole: currentProfile?.role || 'Admin',
       createdBy: currentUser.uid,
     };
-    await db.collection('vaksinasi').add(data);
+    const refBaru = await db.collection('vaksinasi').add(data);
+    catatAudit('tambah', 'vaksinasi', refBaru.id, `Menambahkan vaksinasi "${data.jenisVaksin}" untuk ${data.namaPeternak||'-'}`);
     showToast('Data vaksinasi tersimpan');
     closeModal();
   });
@@ -1881,8 +1940,9 @@ window.editVaksinasi = function(id){
     let owner;
     try{ owner = await resolveOwner('3'); }
     catch(err){ showToast(err.message, true); return; }
+    const jenisVaksinBaru = document.getElementById('f-jenisvaksin').value;
     await db.collection('vaksinasi').doc(id).update({
-      jenisVaksin: document.getElementById('f-jenisvaksin').value,
+      jenisVaksin: jenisVaksinBaru,
       merkVaksin: document.getElementById('f-merkvaksin').value.trim(),
       jenisHewan: document.getElementById('f-jenishewanvaksin').value,
       namaPeternak: owner.namaPeternak,
@@ -1890,6 +1950,7 @@ window.editVaksinasi = function(id){
       noBatch: document.getElementById('f-batch').value.trim(),
       tanggal: new Date(document.getElementById('f-tglvaksin').value),
     });
+    catatAudit('ubah', 'vaksinasi', id, `Mengubah vaksinasi "${jenisVaksinBaru}" untuk ${owner.namaPeternak||'-'}`);
     showToast('Data vaksinasi diperbarui');
     closeModal();
   });
@@ -1900,6 +1961,7 @@ window.deleteVaksinasi = async function(id){
   if(!confirm('Hapus data vaksinasi ini?')) return;
   try{
     await db.collection('vaksinasi').doc(id).delete();
+    catatAudit('hapus', 'vaksinasi', id, `Menghapus vaksinasi "${v?.jenisVaksin||'-'}" untuk ${v?.namaPeternak||'-'}`);
     showToast('Data vaksinasi dihapus');
   }catch(err){
     showToast('Gagal menghapus: ' + err.message, true);
@@ -1986,7 +2048,8 @@ document.getElementById('btn-add-stokobat').addEventListener('click', ()=>{
       petugas: currentProfile?.nama || currentUser.email,
     };
     if(!data.namaObat){ showToast('Nama obat wajib diisi', true); return; }
-    await db.collection('stok_obat').add(data);
+    const refBaru = await db.collection('stok_obat').add(data);
+    catatAudit('tambah', 'stok_obat', refBaru.id, `Menambahkan stok obat "${data.namaObat}" (masuk ${data.stokMasuk})`);
     showToast('Stok obat ditambahkan');
     closeModal();
   });
@@ -2008,7 +2071,8 @@ document.getElementById('btn-add-stokalkeswan').addEventListener('click', ()=>{
       petugas: currentProfile?.nama || currentUser.email,
     };
     if(!data.namaObat){ showToast('Nama alat wajib diisi', true); return; }
-    await db.collection('stok_obat').add(data);
+    const refBaru = await db.collection('stok_obat').add(data);
+    catatAudit('tambah', 'stok_obat', refBaru.id, `Menambahkan stok alkeswan "${data.namaObat}" (masuk ${data.stokMasuk})`);
     showToast('Stok alkeswan ditambahkan');
     closeModal();
   });
@@ -2017,8 +2081,9 @@ window.editStok = function(id){
   const s = stokCache.find(x=>x.id===id);
   const kategori = s.kategori==='Alkeswan' ? 'Alkeswan' : 'Obat';
   openModal('Edit Stok', stokFormHtml(s, kategori), async ()=>{
+    const namaBaru = document.getElementById('f-namaobat').value.trim();
     await db.collection('stok_obat').doc(id).update({
-      namaObat: document.getElementById('f-namaobat').value.trim(),
+      namaObat: namaBaru,
       satuan: document.getElementById('f-satuan').value.trim(),
       stokMasuk: Number(document.getElementById('f-masuk').value)||0,
       stokKeluar: Number(document.getElementById('f-keluar').value)||0,
@@ -2029,14 +2094,17 @@ window.editStok = function(id){
       tujuan: document.getElementById('f-tujuan').value.trim(),
       ket: document.getElementById('f-ket').value.trim(),
     });
+    catatAudit('ubah', 'stok_obat', id, `Mengubah stok "${namaBaru}" (sebelumnya "${s.namaObat}")`);
     showToast('Data stok diperbarui');
     closeModal();
   });
 };
 window.deleteStok = async function(id){
+  const s = stokCache.find(x=>x.id===id);
   if(!confirm('Hapus item stok ini?')) return;
   try{
     await db.collection('stok_obat').doc(id).delete();
+    catatAudit('hapus', 'stok_obat', id, `Menghapus stok "${s?.namaObat||'-'}"`);
     showToast('Item stok dihapus');
   }catch(err){
     showToast('Gagal menghapus: ' + err.message, true);
@@ -2076,6 +2144,7 @@ window.hapusPetugasPending = async function(emailEncoded){
   if(!confirm(`Batalkan undangan untuk ${email}?`)) return;
   try{
     await db.collection('petugas_pending').doc(email).delete();
+    catatAudit('hapus', 'petugas_pending', email, `Membatalkan undangan petugas untuk ${email}`);
     showToast('Undangan dibatalkan');
   }catch(err){
     showToast('Gagal membatalkan: ' + err.message, true);
@@ -2111,6 +2180,7 @@ document.getElementById('btn-add-petugas').addEventListener('click', ()=>{
       createdAt: firebase.firestore.FieldValue.serverTimestamp(),
       createdBy: currentUser.uid
     });
+    catatAudit('tambah', 'petugas_pending', email, `Mendaftarkan undangan petugas baru "${nama}" (${email}, ${role})`);
     showToast('Undangan petugas tersimpan. Jangan lupa buat akun login di Firebase Console.');
     closeModal();
   });
@@ -2189,6 +2259,7 @@ window.editJabatanPetugas = function(id){
     const jabatanBaru = document.getElementById('f-jabatan-petugas').value;
     try{
       await db.collection('petugas').doc(id).update({role: jabatanBaru});
+      catatAudit('ubah', 'petugas', id, `Mengubah jabatan "${p.nama}" dari "${p.role}" menjadi "${jabatanBaru}"`);
       showToast('Jabatan petugas berhasil diubah');
       closeModal();
     }catch(err){
@@ -2205,6 +2276,7 @@ window.toggleAktifPetugas = async function(id, sedangAktif){
   if(!confirm(konfirmasi)) return;
   try{
     await db.collection('petugas').doc(id).update({aktif: !sedangAktif});
+    catatAudit('ubah', 'petugas', id, `${sedangAktif ? 'Menonaktifkan' : 'Mengaktifkan kembali'} akun "${p?.nama||'-'}"`);
     showToast(sedangAktif ? 'Akun petugas dinonaktifkan' : 'Akun petugas diaktifkan kembali');
   }catch(err){
     showToast('Gagal mengubah status: ' + err.message, true);
@@ -2219,6 +2291,7 @@ window.toggleAksesStokPetugas = async function(id, sedangPunya){
   if(!confirm(konfirmasi)) return;
   try{
     await db.collection('petugas').doc(id).update({aksesStok: !sedangPunya});
+    catatAudit('ubah', 'petugas', id, `${sedangPunya ? 'Mencabut' : 'Memberikan'} akses Stok untuk "${p?.nama||'-'}"`);
     showToast(sedangPunya ? 'Akses Stok dicabut' : 'Akses Stok diberikan');
   }catch(err){
     showToast('Gagal mengubah akses: ' + err.message, true);
@@ -3267,6 +3340,7 @@ document.getElementById('btn-perbaiki-peternak').addEventListener('click', async
     prosesKoleksi('peternak', peternakCache);
     prosesKoleksi('ternak', ternakCache);
     for(const b of semuaBatch){ await b.commit(); }
+    catatAudit('ubah', 'peternak+ternak', uidTujuan, `Menetapkan ${ditandai} data Peternak/Ternak tanpa pembuat menjadi milik "${petugasTujuan?.nama||'-'}"`);
     hasilBox.innerHTML = `
       ✅ Ditandai sebagai milik <b>${escapeHtml(petugasTujuan?.nama||'-')}</b>: <b>${ditandai}</b> data<br>
       ℹ️ Sudah punya penanda sebelumnya (dilewati): ${sudahAda} data
@@ -3314,6 +3388,8 @@ document.getElementById('btn-gabung-akun').addEventListener('click', async ()=>{
       await db.collection('petugas').doc(uidDari).update({aktif:false});
     }
     const totalDipindah = Object.values(hasilPerKoleksi).reduce((a,b)=>a+b,0);
+    catatAudit('ubah', 'peternak+ternak+pelayanan+vaksinasi', uidDari,
+      `Menggabungkan akun duplikat (UID ${uidDari}) ke "${petugasKe?.nama||'-'}": ${totalDipindah} data dipindahkan (P:${hasilPerKoleksi.peternak} T:${hasilPerKoleksi.ternak} Yan:${hasilPerKoleksi.pelayanan} Vak:${hasilPerKoleksi.vaksinasi})${nonaktifkanLama && petugasDariDikenal ? ', akun lama dinonaktifkan' : ''}`);
     hasilBox.innerHTML = `
       ✅ Data berhasil dipindahkan ke <b>${escapeHtml(petugasKe?.nama||'-')}</b>:<br>
       &nbsp;&nbsp;• Peternak: ${hasilPerKoleksi.peternak} data<br>
@@ -3331,6 +3407,46 @@ document.getElementById('btn-gabung-akun').addEventListener('click', async ()=>{
     btn.disabled = false; btn.textContent = '🔗 Gabungkan Sekarang';
   }
 });
+
+/* =========================================================
+   LOG AKTIVITAS (audit trail, khusus Admin)
+========================================================= */
+let auditLogDokumenTerakhir = null;
+function labelAksiAudit(aksi){
+  if(aksi==='tambah') return '<span class="badge" style="background:#E1F0E4; color:#3F7A4F;">Tambah</span>';
+  if(aksi==='ubah') return '<span class="badge" style="background:#F1E9F7; color:#6B3F94;">Ubah</span>';
+  if(aksi==='hapus') return '<span class="badge" style="background:var(--danger-light); color:var(--danger);">Hapus</span>';
+  return escapeHtml(aksi);
+}
+function fmtWaktuAudit(ts){
+  if(!ts?.toDate) return '-';
+  return ts.toDate().toLocaleString('id-ID', {day:'2-digit', month:'short', year:'numeric', hour:'2-digit', minute:'2-digit'});
+}
+async function muatAuditLog(lanjutan){
+  const tbody = document.getElementById('table-auditlog');
+  const btnLebih = document.getElementById('btn-lebih-auditlog');
+  try{
+    let query = db.collection('audit_log').orderBy('waktu','desc').limit(100);
+    if(lanjutan && auditLogDokumenTerakhir) query = query.startAfter(auditLogDokumenTerakhir);
+    const snap = await query.get();
+    if(snap.empty && !lanjutan){
+      tbody.innerHTML = '<tr><td class="empty-row" colspan="5">Belum ada log aktivitas</td></tr>';
+      btnLebih.style.display = 'none';
+      return;
+    }
+    const barisHtml = snap.docs.map(d=>{
+      const l = d.data();
+      return `<tr><td>${fmtWaktuAudit(l.waktu)}</td><td>${escapeHtml(l.nama)}<br><span style="font-size:11px; color:var(--text-muted);">${escapeHtml(l.email)}</span></td><td>${labelAksiAudit(l.aksi)}</td><td>${escapeHtml(l.koleksi)}</td><td>${escapeHtml(l.ringkasan)}</td></tr>`;
+    }).join('');
+    if(lanjutan){ tbody.innerHTML += barisHtml; } else { tbody.innerHTML = barisHtml; }
+    if(snap.docs.length > 0) auditLogDokumenTerakhir = snap.docs[snap.docs.length-1];
+    btnLebih.style.display = snap.docs.length === 100 ? 'inline-block' : 'none';
+  }catch(err){
+    tbody.innerHTML = `<tr><td class="empty-row" colspan="5">Gagal memuat log: ${escapeHtml(err.message)}</td></tr>`;
+  }
+}
+document.getElementById('btn-muat-auditlog')?.addEventListener('click', ()=>{ auditLogDokumenTerakhir = null; muatAuditLog(false); });
+document.getElementById('btn-lebih-auditlog')?.addEventListener('click', ()=> muatAuditLog(true));
 
 /* =========================================================
    13. INISIALISASI SEMUA LISTENER (dipanggil setelah login)
