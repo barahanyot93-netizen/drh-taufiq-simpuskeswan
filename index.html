@@ -299,6 +299,83 @@
     .laporan-ttd{display:block !important; margin-top:60px; break-inside:avoid; page-break-inside:avoid;}
     .laporan-ttd .ttd-blok{display:inline-block; vertical-align:top; width:48%;}
   }
+
+  /* ---------- Dashboard V1.3 ---------- */
+  .sidebar-brand{padding:20px 16px 16px;}
+  .sidebar-brand .brand-text span{font-size:10px; line-height:1.4; display:block; margin-top:2px;}
+  .dash-grid{display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-bottom:22px;}
+  .dash-card{background:var(--surface); border-radius:14px; box-shadow:var(--shadow); padding:18px 20px; border-top:4px solid var(--primary);}
+  .dash-wide{grid-column:1 / -1;}
+  .dash-head{display:flex; align-items:center; gap:12px; margin-bottom:12px;}
+  .dash-ic{font-size:26px; line-height:1;}
+  .dash-ttl{flex:1; min-width:0;}
+  .dash-ttl h3{margin:0; font-size:15px; color:var(--primary-dark);}
+  .dash-sub{font-size:12px; color:var(--text-muted); margin-top:2px;}
+  .dash-total{font-family:'Plus Jakarta Sans',sans-serif; font-size:30px; font-weight:800; color:var(--primary-dark);}
+  .dash-select{padding:6px 10px; border:1.5px solid var(--border); border-radius:8px; font-size:13px; background:#FBFAF6;}
+  .pop-grid{display:grid; grid-template-columns:repeat(auto-fill,minmax(120px,1fr)); gap:8px;}
+  .pop-item{display:flex; justify-content:space-between; align-items:baseline; gap:8px; background:var(--primary-light); border-radius:8px; padding:7px 10px; font-size:13px;}
+  .pop-item b{font-size:15px; color:var(--primary-dark);}
+  .dash-note{font-size:11.5px; color:var(--text-muted); margin-top:10px;}
+  .dash-empty{font-size:13px; color:var(--text-muted); padding:6px 0;}
+  .big-status{font-family:'Plus Jakarta Sans',sans-serif; font-size:20px; font-weight:800; line-height:1.25; margin-bottom:10px;}
+  .dash-list{list-style:none; margin:0; padding:0; display:grid; gap:8px; max-height:230px; overflow:auto; font-size:13px;}
+  .dash-list li{padding:8px 11px; background:rgba(255,255,255,0.75); border-radius:8px;}
+  .alert-red{background:#FBEAE8; border-top-color:var(--danger); box-shadow:0 0 0 1.5px rgba(179,69,61,0.4), var(--shadow);}
+  .alert-red .big-status, .alert-red .dash-ttl h3{color:var(--danger);}
+  .alert-red .dash-ic{animation:denyut 1.4s ease-in-out infinite;}
+  @keyframes denyut{50%{transform:scale(1.18);}}
+  .ok-green{background:#EAF4EC; border-top-color:var(--success);}
+  .ok-green .big-status{color:var(--success);}
+  .legend{display:flex; gap:16px; font-size:12px; color:var(--text-muted); margin-bottom:6px;}
+  .legend i{display:inline-block; width:11px; height:11px; border-radius:3px; margin-right:6px; vertical-align:-1px;}
+  @media (max-width:760px){ .dash-grid{grid-template-columns:1fr;} }
+  @media (prefers-reduced-motion:reduce){ .alert-red .dash-ic{animation:none;} }
+
+  /* ---------- Kotak wajib isi ---------- */
+  .form-note{font-size:12px; color:var(--text-muted); background:var(--primary-light); border-radius:8px; padding:7px 11px;}
+  .field.invalid input, .field.invalid select, .field.invalid textarea, .field.invalid .chk-group{border-color:var(--danger) !important; background:#FFF6F5 !important;}
+  .field.invalid > label{color:var(--danger);}
+  .err-msg{font-size:12px; font-weight:600; color:var(--danger); margin-top:5px;}
+  .tag{display:inline-block; font-size:11px; font-weight:700; padding:2px 9px; border-radius:100px; vertical-align:1px;}
+  .tag-tertular{background:var(--danger); color:#fff;}
+  .tag-suspect{background:#FBE3E0; color:var(--danger); border:1px solid var(--danger);}
+  .phms-box{padding:12px 14px; border:1.5px dashed var(--border); border-radius:10px; background:#FBFAF6;}
+  .umur-row{display:flex; gap:8px;}
+  .umur-row input{flex:1; min-width:0;}
+  .umur-row select{width:110px; flex-shrink:0;}
+  .field input::placeholder, .field textarea::placeholder{color:#A8A598;}
+
+  /* ---------- Cetak: perbaikan halaman tertimpa + footer hak milik ---------- */
+  /* Hak milik tampil di footer setiap halaman cetak (margin box bawaan Chrome) */
+  @page{ size: A4 landscape; margin: 10mm 10mm 16mm 10mm;
+    @bottom-center{ content: "© Hak Cipta 2026 | Milik drh. Abdillah Taufiq"; font-family: Arial, sans-serif; font-size: 9pt; color: #555; } }
+  @media print{
+    html, body{height:auto !important;}
+    .shell{display:block !important;}
+    .main{margin-left:0 !important; min-height:0 !important;}
+    .content{padding:0 !important;}
+    .page.active{animation:none !important;}
+    .panel{box-shadow:none !important; padding:0 !important; margin:0 !important; background:none !important; border-radius:0 !important;}
+    #laporan-print-area, #pkh-print-area, #petugas-laporan-print-area{position:static !important; width:100% !important; padding:0 !important;}
+    body.print-laporan #petugas-laporan-print-area, body.print-laporan #pkh-print-area,
+    body.print-petugas #laporan-print-area, body.print-petugas #pkh-print-area,
+    body.print-pkh #laporan-print-area, body.print-pkh #petugas-laporan-print-area{display:none !important;}
+  }
+
+  /* ---------- Baris hewan (spesies + jantan/betina) ---------- */
+  .hewan-blok > label{display:block;}
+  .hewan-rows{display:grid; gap:10px; margin:8px 0 10px;}
+  .hewan-row{display:grid; grid-template-columns:1.5fr 1fr 1fr auto; gap:10px; align-items:end; padding:10px 12px; border:1.5px solid var(--border); border-radius:10px; background:#FBFAF6;}
+  .hewan-row.dengan-umur{grid-template-columns:1.3fr .8fr .8fr 1.6fr auto;}
+  .hewan-row .field{margin-bottom:0;}
+  .hewan-row .h-catatan{grid-column:1 / -1; margin:0; color:var(--accent-dark);}
+  .h-hapus{margin-bottom:6px;}
+  @media (max-width:640px){ .hewan-row, .hewan-row.dengan-umur{grid-template-columns:1fr 1fr;} .hewan-row .field:first-child{grid-column:1 / -1;} .h-hapus{justify-self:end;} }
+
+  /* Baris JUMLAH berlatar gelap: teks putih agar terbaca, dan latar ikut tercetak */
+  tr[style*="--primary-dark"] td{color:#fff !important;}
+  @media print{ tr[style*="--primary-dark"], tr[style*="--primary-dark"] td, tr[style*="--primary-light"], tr[style*="--primary-light"] td, thead th{-webkit-print-color-adjust:exact; print-color-adjust:exact;} }
 </style>
 </head>
 <body>
@@ -347,7 +424,7 @@
         <img class="logo-img" src="data:image/webp;base64,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" alt="Logo">
         <div class="brand-text">
           <b>SIMPUSKESWAN</b>
-          <span>Puskeswan Wilayah II</span>
+          <span>UPTD Puskeswan Wilayah II<br>Dinas Perkebunan dan Peternakan<br>Kabupaten Aceh Barat</span>
         </div>
       </div>
       <ul class="nav-list">
@@ -392,11 +469,39 @@
           <div style="text-align:center; margin-bottom:20px;">
             <h2 style="margin:0; font-size:17px; color:var(--primary-dark); line-height:1.4;">UPTD PUSKESWAN WILAYAH II<br>DINAS PERKEBUNAN DAN PETERNAKAN<br>KABUPATEN ACEH BARAT</h2>
           </div>
-          <div class="stat-grid">
-            <div class="stat-card"><div class="stat-ic">🐄</div><div class="stat-num" id="stat-ternak">0</div><div class="stat-label">Total Hewan Dilayani</div></div>
-            <div class="stat-card c-accent"><div class="stat-ic">👨‍🌾</div><div class="stat-num" id="stat-peternak">0</div><div class="stat-label">Pemilik Terdaftar</div></div>
-            <div class="stat-card c-success"><div class="stat-ic">💉</div><div class="stat-num" id="stat-pelayanan">0</div><div class="stat-label">Pelayanan Bulan Ini</div></div>
-            <div class="stat-card c-danger"><div class="stat-ic">🦠</div><div class="stat-num" id="stat-vaksinasi">0</div><div class="stat-label">Vaksinasi Bulan Ini</div></div>
+          <div class="dash-grid">
+            <div class="dash-card" id="card-phms">
+              <div class="dash-head">
+                <div class="dash-ic">🚨</div>
+                <div class="dash-ttl"><h3>Warning Deteksi Kasus PHMS</h3><div class="dash-sub">Dari data Pelayanan &amp; Konsultasi <span class="phms-jendela">14</span> hari terakhir</div></div>
+              </div>
+              <div id="phms-body"></div>
+            </div>
+            <div class="dash-card" id="card-status">
+              <div class="dash-head">
+                <div class="dash-ic">📍</div>
+                <div class="dash-ttl"><h3>Status Gampong PHMS</h3><div class="dash-sub">Tertular, Suspect <span class="phms-jendela">14</span> atau Bebas</div></div>
+              </div>
+              <div id="status-body"></div>
+            </div>
+            <div class="dash-card dash-wide" id="card-populasi">
+              <div class="dash-head">
+                <div class="dash-ic">🐄</div>
+                <div class="dash-ttl"><h3>Populasi Hewan</h3><div class="dash-sub" id="populasi-sub">Total populasi per spesies di 3 kecamatan</div></div>
+              </div>
+              <div id="populasi-list" class="pop-grid"></div>
+              <div class="dash-note">Arongan Lambalek · Woyla Barat · Bubon</div>
+            </div>
+            <div class="dash-card dash-wide" id="card-grafik">
+              <div class="dash-head">
+                <div class="dash-ic">📊</div>
+                <div class="dash-ttl"><h3>Grafik Pengobatan &amp; Vaksinasi</h3><div class="dash-sub">Jumlah ekor per bulan</div></div>
+                <select id="grafik-tahun" class="dash-select" aria-label="Tahun grafik"></select>
+              </div>
+              <div id="grafik-total" class="dash-sub" style="margin-bottom:8px;"></div>
+              <div class="legend"><span><i style="background:#2F5233"></i>Pengobatan</span><span><i style="background:#C08A3E"></i>Vaksinasi</span></div>
+              <div id="grafik-wrap"></div>
+            </div>
           </div>
           <div class="panel">
             <h3>Aktivitas Pelayanan Terbaru</h3>
@@ -443,8 +548,8 @@
             </div>
             <div class="table-wrap">
               <table>
-                <thead><tr><th>Tanggal</th><th>Jenis Vaksin</th><th>Pemilik</th><th>Jenis Hewan</th><th>Jml Hewan</th><th>No. Batch</th><th>Petugas</th><th></th></tr></thead>
-                <tbody id="table-vaksinasi"><tr><td class="empty-row" colspan="8">Memuat data...</td></tr></tbody>
+                <thead><tr><th>Tanggal</th><th>Jenis Vaksin</th><th>Pemilik</th><th>Jenis Hewan</th><th>Jml Hewan</th><th>Petugas</th><th></th></tr></thead>
+                <tbody id="table-vaksinasi"><tr><td class="empty-row" colspan="7">Memuat data...</td></tr></tbody>
               </table>
             </div>
           </div>
@@ -571,7 +676,6 @@
                   <div id="laporan-nip-kepala" style="margin-top:2px;">NIP. -</div>
                 </div>
               </div>
-              <div style="width:100%; text-align:center; font-size:10px; letter-spacing:0.2px; color:#777; margin-top:30px;">© Hak Cipta 2026 | Milik drh. Abdillah Taufiq</div>
             </div>
           </div>
 
@@ -630,7 +734,7 @@
               <h4 style="margin:0 0 10px;">A. Data Pelayanan</h4>
               <div class="table-wrap" style="margin-bottom:22px;">
                 <table>
-                  <thead><tr><th>No</th><th>Tanggal</th><th>Jenis Layanan</th><th>Anamnesa</th><th>Jenis Penyakit</th><th>Terapi</th><th>Pemilik/Kegiatan</th><th>Desa</th><th>Kecamatan</th><th>Hewan</th></tr></thead>
+                  <thead><tr><th>No</th><th>Tanggal</th><th>Jenis Layanan</th><th>Anamnesa</th><th>Jenis Penyakit</th><th>Terapi</th><th>Pemilik/Kegiatan</th><th>Desa</th><th>Kecamatan</th><th>Hewan</th><th>Jumlah</th></tr></thead>
                   <tbody id="petugaslaporan-body-pelayanan"></tbody>
                   <tbody id="petugaslaporan-body-pelayanan-tail" style="break-inside:avoid; page-break-inside:avoid;"></tbody>
                 </table>
@@ -663,7 +767,6 @@
                   <div id="petugaslaporan-nip-kepala" style="margin-top:2px;">NIP. -</div>
                 </div>
               </div>
-              <div style="width:100%; text-align:center; font-size:10px; letter-spacing:0.2px; color:#777; margin-top:30px;">© Hak Cipta 2026 | Milik drh. Abdillah Taufiq</div>
             </div>
           </div>
         </div>
@@ -775,7 +878,6 @@
                   <div id="pkh-nip-kepala" style="margin-top:2px;">NIP. -</div>
                 </div>
               </div>
-              <div style="width:100%; text-align:center; font-size:10px; letter-spacing:0.2px; color:#777; margin-top:30px;">© Hak Cipta 2026 | Milik drh. Abdillah Taufiq</div>
             </div>
           </div>
         </div>
@@ -882,6 +984,15 @@
             <div id="hasil-perbaiki-kepemilikan" style="margin-top:12px; font-size:12.5px; line-height:1.6;"></div>
           </div>
 
+          <div class="panel" style="max-width:520px;" id="panel-populasi">
+            <h3>Data Populasi Ternak</h3>
+            <p style="font-size:12.5px; color:var(--text-muted); margin:0 0 14px;">
+              Angka total populasi per spesies (gabungan 3 kecamatan) yang tampil di kartu Populasi pada Dashboard. Isi dari tabel Jumlah Populasi Ternak terbaru, lalu simpan.
+            </p>
+            <div id="form-populasi" class="form-stack"></div>
+            <button class="btn btn-primary btn-sm" id="btn-save-populasi" style="margin-top:14px;">Simpan Data Populasi</button>
+          </div>
+
           <div class="panel" style="max-width:460px;" id="panel-gabung-akun">
             <h3>Gabungkan Akun Duplikat</h3>
             <p style="font-size:12.5px; color:var(--text-muted); margin:0 0 14px;">
@@ -935,6 +1046,7 @@
   </div>
 </div>
 
+<datalist id="dl-gampong"></datalist>
 <datalist id="dl-pemilik"></datalist>
 <div id="toast"></div>
 
@@ -1304,9 +1416,8 @@ function initPeternakListener(){
   db.collection('peternak').orderBy('nama').onSnapshot(snap=>{
     peternakCache = [];
     snap.forEach(d=> peternakCache.push({id:d.id, ...d.data()}));
-    const el = document.getElementById('stat-peternak');
-    if(el) el.textContent = peternakCache.length;
     isiDatalistPemilik();
+    renderDashboard();
   }, err=> showToast('Gagal memuat data pemilik: '+err.message, true));
 }
 // Data hewan lama tetap dimuat supaya ikut masuk Backup Data
@@ -1314,6 +1425,7 @@ function initTernakListener(){
   db.collection('ternak').orderBy('tanggalData','desc').onSnapshot(snap=>{
     ternakCache = [];
     snap.forEach(d=> ternakCache.push({id:d.id, ...d.data()}));
+    renderDashboard();
   }, err=> console.warn('Gagal memuat data ternak lama:', err.message));
 }
 
@@ -1333,7 +1445,76 @@ const DISEASE_MAP_PKH5 = [
 const JENIS_LAYANAN = ['Pengobatan','Konsultasi','Pemeriksaan Kesehatan','Bedah Minor','Lainnya'];
 const SISTEM_PELAYANAN = ['Aktif','Semi Aktif','Pasif'];
 const STATUS_PELAYANAN = ['Sembuh','Masih Sakit','Mati','Selesai'];
+const JENIS_KONSULTASI = ['Konsultasi kesehatan ternak','Konsultasi gejala penyakit','Konsultasi vaksinasi','Konsultasi reproduksi','Konsultasi pakan dan pemeliharaan'];
 const JENIS_VAKSIN = ['PMK','LSD','SE','BRUCELLOSIS','ND','AI','RABIES'];
+
+// Jumlah + jenis kelamin dengan simbol: 6 ekor (3♂ 3♀)
+function fmtSexIsi(r){
+  const j = Number(r.jantan)||0, b = Number(r.betina)||0;
+  if(!j && !b) return '';
+  return [j ? `${j}♂` : '', b ? `${b}♀` : ''].filter(Boolean).join(' ');
+}
+function fmtEkorSex(r){ const sx = fmtSexIsi(r); return `${Number(r.jumlahTernak)||0} ekor${sx ? ` (${sx})` : ''}`; }
+function fmtEkorSexDlmKurung(r){ const sx = fmtSexIsi(r); return `${Number(r.jumlahTernak)||0} ekor${sx ? `: ${sx}` : ''}`; }
+
+// ---------- Nama Gampong kanonik: ejaan yang nyaris sama dalam satu kecamatan dianggap satu Gampong ----------
+// (mis. "Drein Rampak" dan "Drien Rampak"). Ejaan yang paling sering dipakai menjadi nama resminya.
+function mirip1(a, b){
+  if(a === b) return true;
+  const la = a.length, lb = b.length;
+  if(Math.abs(la - lb) > 1) return false;
+  if(la === lb){
+    let i = 0; while(i < la && a[i] === b[i]) i++;
+    if(i === la) return true;
+    if(a.slice(i+1) === b.slice(i+1)) return true;                                   // satu huruf berbeda
+    return i+1 < la && a[i] === b[i+1] && a[i+1] === b[i] && a.slice(i+2) === b.slice(i+2); // dua huruf tertukar
+  }
+  const [k, p] = la < lb ? [a, b] : [b, a];
+  let i = 0; while(i < k.length && k[i] === p[i]) i++;
+  return k.slice(i) === p.slice(i+1);                                                // satu huruf kelebihan/kurang
+}
+const miripGampong = (a, b)=> a.length >= 5 && b.length >= 5 && mirip1(a, b);
+let _petaGampong = null;
+function bangunPetaGampong(){
+  const frek = {};
+  const tambah = (kec, desa)=>{
+    if(!kec || !desa) return;
+    const nm = normTeks(desa), raw = desa.trim();
+    const k = frek[kec] || (frek[kec] = new Map());
+    const e = k.get(nm) || {n:0, raw:{}};
+    e.n++; e.raw[raw] = (e.raw[raw]||0) + 1; k.set(nm, e);
+  };
+  peternakCache.forEach(p=> tambah(p.kecamatan, p.desa));
+  pelayananCache.forEach(p=> { if(p.jenisLayanan !== 'Pemeriksaan Kesehatan') tambah(p.kecamatan, p.desa); });
+  vaksinasiCache.forEach(v=> tambah(v.kecamatan, v.desa));
+  const peta = new Map();
+  Object.keys(frek).forEach(kec=>{
+    const urut = Array.from(frek[kec].entries()).sort((a,b)=> b[1].n - a[1].n);
+    const wakil = [];
+    urut.forEach(([nm, e])=>{
+      const w = wakil.find(x=> miripGampong(x.nm, nm));
+      if(w){ peta.set(kec+'|'+nm, w.tampil); }
+      else{
+        const tampil = Object.entries(e.raw).sort((a,b)=> b[1]-a[1])[0][0];
+        wakil.push({nm, tampil});
+        peta.set(kec+'|'+nm, tampil);
+      }
+    });
+  });
+  return peta;
+}
+function gampongKanon(kec, desa){
+  if(!desa) return '';
+  if(!_petaGampong) _petaGampong = bangunPetaGampong();
+  return _petaGampong.get(kec+'|'+normTeks(desa)) || desa;
+}
+
+// Mode cetak: hanya laporan yang sedang dicetak yang diikutkan (mencegah halaman saling menimpa)
+function cetakDengan(mode){
+  document.body.classList.add('print-' + mode);
+  window.print();
+}
+window.addEventListener('afterprint', ()=> document.body.classList.remove('print-laporan','print-petugas','print-pkh'));
 
 function kodePenyakitVaksin(jenisVaksin){
   const teks = (jenisVaksin||'').trim().toUpperCase();
@@ -1343,6 +1524,28 @@ function kodePenyakitVaksin(jenisVaksin){
 
 // ---------- helper form ----------
 const gv = (id)=> (document.getElementById(id)?.value || '').trim();
+
+// Validasi kotak wajib isi: kotak yang kosong diberi tanda merah + perintah singkat
+class FieldError extends Error{ constructor(id, msg){ super(msg); this.fieldId = id; } }
+function wajib(id, pesan){ const v = gv(id); if(!v) throw new FieldError(id, pesan); return v; }
+function bersihkanError(){
+  document.querySelectorAll('.field.invalid').forEach(f=>{ f.classList.remove('invalid'); f.querySelector('.err-msg')?.remove(); });
+}
+function tandaiError(err){
+  bersihkanError();
+  const el = typeof err.fieldId === 'string' ? document.getElementById(err.fieldId) : (err.fieldId || null);
+  const f = el ? el.closest('.field') : null;
+  if(f){
+    f.classList.add('invalid');
+    const m = document.createElement('div'); m.className = 'err-msg'; m.textContent = '⚠ ' + err.message; f.appendChild(m);
+    const hapus = ()=>{ f.classList.remove('invalid'); m.remove(); };
+    el.addEventListener('input', hapus, {once:true});
+    el.addEventListener('change', hapus, {once:true});
+    el.scrollIntoView({block:'center', behavior:'smooth'});
+    el.focus({preventScroll:true});
+  }
+  showToast(err.message, true);
+}
 const normTeks = (s)=> (s||'').toString().trim().toLowerCase().replace(/\s+/g,' ');
 function tampilkan(id, on){ const e = document.getElementById(id); if(e) e.style.display = on ? '' : 'none'; }
 function tglInputValue(tgl){
@@ -1350,26 +1553,42 @@ function tglInputValue(tgl){
   return d.toISOString().slice(0,10);
 }
 function opsiSelectHtml(daftar, terpilih=''){
-  return `<option value="">Pilih...</option>` + daftar.map(o=>`<option ${terpilih===o?'selected':''}>${escapeHtml(o)}</option>`).join('');
+  // nilai lama yang tidak ada di daftar tetap ditampilkan agar data lama tidak hilang saat diubah
+  const lengkap = (terpilih && !daftar.includes(terpilih)) ? [...daftar, terpilih] : daftar;
+  return `<option value="">Pilih...</option>` + lengkap.map(o=>`<option ${terpilih===o?'selected':''}>${escapeHtml(o)}</option>`).join('');
 }
 
-function isiDatalistPemilik(){
-  const dl = document.getElementById('dl-pemilik');
-  if(!dl) return;
-  dl.innerHTML = peternakCache.filter(p=>p.nama).map(p=>
-    `<option value="${escapeHtml(p.nama)}">${escapeHtml([p.desa,p.kecamatan].filter(Boolean).join(', '))}</option>`
-  ).join('');
+// Saran isian: Gampong sesuai Kecamatan terpilih, dan nama pemilik HANYA yang tersimpan di Gampong terpilih (urut abjad)
+const urutAbjad = (a,b)=> a.localeCompare(b, 'id', {sensitivity:'base'});
+function perbaruiSaran(sfx){
+  const dg = document.getElementById('dl-gampong'), dp = document.getElementById('dl-pemilik');
+  if(!dg || !dp) return;
+  const kec = gv('f-kec'+sfx), desa = normTeks(gv('f-desa'+sfx));
+  const gam = new Map();
+  if(kec) peternakCache.forEach(p=>{
+    if(p.kecamatan !== kec || !p.desa) return;
+    const k = normTeks(p.desa); if(!gam.has(k)) gam.set(k, p.desa.trim());
+  });
+  dg.innerHTML = Array.from(gam.values()).sort(urutAbjad).map(g=>`<option value="${escapeHtml(g)}"></option>`).join('');
+  const nama = new Map();
+  if(kec && desa) peternakCache.forEach(p=>{
+    if(p.kecamatan !== kec || normTeks(p.desa) !== desa || !p.nama) return;
+    const k = normTeks(p.nama); if(!nama.has(k)) nama.set(k, p.nama.trim());
+  });
+  dp.innerHTML = Array.from(nama.values()).sort(urutAbjad).map(n=>`<option value="${escapeHtml(n)}"></option>`).join('');
 }
+window.perbaruiSaran = perbaruiSaran;
+function isiDatalistPemilik(){ perbaruiSaran(''); perbaruiSaran('V'); }
 
 // Data pemilik untuk satu catatan (catatan lama belum menyimpan desa/kecamatan sendiri)
 function ownerPrefill(rec={}){
-  const lama = (!rec.kecamatan && !rec.desa && rec.namaPeternak)
-    ? peternakCache.find(x=>x.nama===rec.namaPeternak) : null;
+  const lama = rec.namaPeternak
+    ? peternakCache.find(x=>x.nama===rec.namaPeternak && (!rec.desa || x.desa===rec.desa)) : null;
   return {
     nama: rec.namaPeternak || '',
     kecamatan: rec.kecamatan || lama?.kecamatan || '',
     desa: rec.desa || lama?.desa || '',
-    alamat: rec.alamatPemilik || lama?.alamat || ''
+    nik: rec.nik || lama?.nik || ''
   };
 }
 function selPemilikHtml(rec){
@@ -1378,63 +1597,111 @@ function selPemilikHtml(rec){
   return `${escapeHtml(rec.namaPeternak)||'-'}${sub ? `<br><span class="sub-text">${escapeHtml(sub)}</span>` : ''}`;
 }
 
-// Blok isian pemilik: Kecamatan, Gampong/Desa, Nama Pemilik, Alamat Pemilik
-function ownerFormHtml(sfx, rec={}){
+// Blok isian pemilik: Kecamatan, Gampong/Desa, Nama Pemilik (+ NIK untuk vaksinasi)
+function ownerFormHtml(sfx, rec={}, denganNik=false){
   const o = ownerPrefill(rec);
   return `
     <div class="row2">
       <div class="field"><label>Kecamatan <span class="req">*</span></label>
-        <select id="f-kec${sfx}">${opsiSelectHtml(KECAMATAN_DIIZINKAN, o.kecamatan)}</select>
+        <select id="f-kec${sfx}" onchange="perbaruiSaran('${sfx}')">${opsiSelectHtml(KECAMATAN_DIIZINKAN, o.kecamatan)}</select>
       </div>
       <div class="field"><label>Gampong/Desa <span class="req">*</span></label>
-        <input id="f-desa${sfx}" value="${escapeHtml(o.desa)}" placeholder="Gampong/Desa">
+        <input id="f-desa${sfx}" list="dl-gampong" autocomplete="off" value="${escapeHtml(o.desa)}" placeholder="Wajib diisi" oninput="perbaruiSaran('${sfx}')" onfocus="perbaruiSaran('${sfx}')">
       </div>
     </div>
     <div class="field"><label>Nama Pemilik <span class="req">*</span></label>
-      <input id="f-nama${sfx}" list="dl-pemilik" autocomplete="off" value="${escapeHtml(o.nama)}" placeholder="Nama Pemilik" onchange="isiOtomatisPemilik('${sfx}')">
-      <div class="hint">Pemilik yang pernah dientri muncul sebagai saran, data alamatnya terisi otomatis.</div>
+      <input id="f-nama${sfx}" list="dl-pemilik" autocomplete="off" value="${escapeHtml(o.nama)}" placeholder="Wajib diisi — ketik atau pilih nama" onfocus="perbaruiSaran('${sfx}')" onchange="isiOtomatisPemilik('${sfx}')">
+      <div class="hint">Isi Kecamatan dan Gampong lebih dulu. Saran nama hanya menampilkan pemilik yang sudah tersimpan di Gampong tersebut (urut abjad). Pemilik baru cukup diketik.</div>
     </div>
-    <div class="field"><label>Alamat Pemilik</label>
-      <input id="f-alamat${sfx}" value="${escapeHtml(o.alamat)}" placeholder="Alamat Pemilik">
-    </div>`;
+    ${denganNik ? `<div class="field"><label>NIK Pemilik <span class="req">*</span></label>
+      <input id="f-nik${sfx}" inputmode="numeric" maxlength="16" autocomplete="off" value="${escapeHtml(o.nik)}" placeholder="Wajib diisi — 16 digit NIK pemilik">
+    </div>` : ''}`;
 }
-function hewanFormHtml(sfx, rec={}){
-  return `
-    <div class="row2">
-      <div class="field"><label>Jenis Hewan <span class="req">*</span></label>
-        <select id="f-jenisternak${sfx}">${opsiSelectHtml(JENIS_HEWAN, rec.jenisTernak || rec.jenisHewan || '')}</select>
-      </div>
-      <div class="field"><label>Jumlah Ekor <span class="req">*</span></label>
-        <input type="number" id="f-jumlahternak${sfx}" min="1" value="${escapeHtml(rec.jumlahTernak)}" placeholder="Jumlah Ekor">
-      </div>
-    </div>`;
+// ---------- Blok hewan: boleh lebih dari satu spesies, jumlah dipisah ♂ jantan dan ♀ betina ----------
+function barisHewanHtml(h={}, denganUmur=false, bisaHapus=true, catatan=''){
+  return `<div class="hewan-row ${denganUmur ? 'dengan-umur' : ''}">
+    <div class="field"><label>Jenis Hewan <span class="req">*</span></label>
+      <select class="h-jenis">${opsiSelectHtml(JENIS_HEWAN, h.jenis || '')}</select></div>
+    <div class="field"><label>♂ Jantan</label>
+      <input type="number" class="h-jantan" min="0" inputmode="numeric" value="${escapeHtml(h.jantan)}" placeholder="0"></div>
+    <div class="field"><label>♀ Betina</label>
+      <input type="number" class="h-betina" min="0" inputmode="numeric" value="${escapeHtml(h.betina)}" placeholder="0"></div>
+    ${bisaHapus ? `<button type="button" class="icon-btn del h-hapus" title="Hapus baris ini" onclick="hapusBarisHewan(this)">🗑️</button>` : ''}
+    ${catatan ? `<div class="hint h-catatan">${catatan}</div>` : ''}
+  </div>`;
 }
+function hewanBlokHtml(sfx, p, vaksin, edit){
+  const jenis = vaksin ? p.jenisHewan : p.jenisTernak;
+  let jantan = p.jantan, betina = p.betina;
+  if(jantan === undefined && betina === undefined && p.sexHewan){ if(p.sexHewan === 'Jantan') jantan = p.jumlahTernak; else betina = p.jumlahTernak; }
+  const lama = (jenis && jantan === undefined && betina === undefined && p.jumlahTernak)
+    ? `Data lama tercatat ${escapeHtml(p.jumlahTernak)} ekor tanpa jenis kelamin. Isi pembagian ♂ jantan dan ♀ betina.` : '';
+  const h = jenis ? {jenis, jantan, betina} : {};
+  return `<div class="field hewan-blok" id="hewan-blok${sfx}">
+    <label>Hewan yang ${vaksin ? 'Divaksin' : 'Dilayani'} <span class="req">*</span></label>
+    <div class="hint">Isi jumlah per jenis kelamin (♂ jantan, ♀ betina). Pemilik yang punya lebih dari satu spesies: klik "+ Tambah Spesies Lain".</div>
+    <div class="hewan-rows" id="hewan-rows${sfx}" data-umur="0">${barisHewanHtml(h, false, !edit, lama)}</div>
+    ${edit ? '' : `<button type="button" class="btn btn-ghost btn-sm" onclick="tambahBarisHewan('${sfx}')">+ Tambah Spesies Lain</button>`}
+  </div>`;
+}
+window.tambahBarisHewan = function(sfx){
+  const box = document.getElementById('hewan-rows'+sfx);
+  if(!box) return;
+  box.insertAdjacentHTML('beforeend', barisHewanHtml({}, box.dataset.umur === '1', true));
+};
+window.hapusBarisHewan = function(btn){
+  const box = btn.closest('.hewan-rows');
+  if(box.querySelectorAll('.hewan-row').length <= 1){ showToast('Minimal satu spesies hewan', true); return; }
+  btn.closest('.hewan-row').remove();
+};
+function bacaHewan(sfx, denganUmur){
+  const rows = Array.from(document.querySelectorAll(`#hewan-rows${sfx} .hewan-row`));
+  if(!rows.length) throw new Error('Tambahkan minimal satu spesies hewan');
+  const dipakai = new Set(), hasil = [];
+  rows.forEach(r=>{
+    const selJ = r.querySelector('.h-jenis'), jenis = selJ.value;
+    if(!jenis) throw new FieldError(selJ, 'Pilih jenis hewan');
+    if(dipakai.has(jenis)) throw new FieldError(selJ, `${jenis} diisi dua kali, gabungkan dalam satu baris`);
+    dipakai.add(jenis);
+    const iJ = r.querySelector('.h-jantan'), iB = r.querySelector('.h-betina');
+    const jantan = Math.max(0, Math.floor(Number(iJ.value) || 0)), betina = Math.max(0, Math.floor(Number(iB.value) || 0));
+    if(jantan + betina < 1) throw new FieldError(iJ, `Isi jumlah ${jenis}: ♂ jantan dan/atau ♀ betina`);
+    const h = {jenis, jantan, betina};
+    hasil.push(h);
+  });
+  return hasil;
+}
+
 // Saat nama dipilih dari saran, isi otomatis kecamatan/desa/alamat yang masih kosong
 window.isiOtomatisPemilik = function(sfx){
-  const nama = normTeks(gv('f-nama'+sfx));
-  if(!nama) return;
-  const cocok = peternakCache.filter(x=>normTeks(x.nama)===nama);
-  if(!cocok.length) return;
-  const desaIn = normTeks(gv('f-desa'+sfx));
-  let pilih = desaIn ? cocok.find(x=>normTeks(x.desa)===desaIn) : null;
-  if(!pilih){
-    if(cocok.length > 1 && !desaIn){ showToast('Ada beberapa pemilik bernama sama. Isi Gampong/Desa untuk memilih yang benar.'); return; }
-    pilih = cocok[0];
-  }
-  const set = (id, val)=>{ const e = document.getElementById(id); if(e && !e.value && val) e.value = val; };
-  set('f-kec'+sfx, pilih.kecamatan);
-  set('f-desa'+sfx, pilih.desa);
-  set('f-alamat'+sfx, pilih.alamat);
+  const nama = normTeks(gv('f-nama'+sfx)), kec = gv('f-kec'+sfx), desa = normTeks(gv('f-desa'+sfx));
+  if(!nama || !kec || !desa) return;
+  const ada = peternakCache.find(x=>x.kecamatan===kec && normTeks(x.desa)===desa && normTeks(x.nama)===nama);
+  if(!ada) return;
+  const e = document.getElementById('f-nik'+sfx);
+  if(e && !e.value && ada.nik) e.value = ada.nik;
 };
 // Baca & validasi isian pemilik (sinkron). Lempar Error kalau belum lengkap.
-function bacaPemilik(sfx){
+function bacaPemilik(sfx, denganNik=false){
   const o = {
     nama: gv('f-nama'+sfx), kecamatan: gv('f-kec'+sfx),
-    desa: gv('f-desa'+sfx), alamat: gv('f-alamat'+sfx)
+    desa: gv('f-desa'+sfx),
+    nik: denganNik ? gv('f-nik'+sfx).replace(/\s+/g,'') : ''
   };
-  if(!o.kecamatan) throw new Error('Kecamatan wajib dipilih');
-  if(!o.desa) throw new Error('Gampong/Desa wajib diisi');
-  if(!o.nama) throw new Error('Nama pemilik wajib diisi');
+  if(!o.kecamatan) throw new FieldError('f-kec'+sfx, 'Pilih kecamatan terlebih dahulu');
+  if(!o.desa) throw new FieldError('f-desa'+sfx, 'Isi nama Gampong/Desa');
+  if(!o.nama) throw new FieldError('f-nama'+sfx, 'Isi nama pemilik');
+  // Samakan ejaan dengan Gampong yang sudah tersimpan di kecamatan ini
+  const adaDesa = new Map();
+  peternakCache.forEach(p=>{ if(p.kecamatan === o.kecamatan && p.desa) adaDesa.set(normTeks(p.desa), gampongKanon(p.kecamatan, p.desa)); });
+  const persis = adaDesa.get(normTeks(o.desa));
+  if(persis){ o.desa = persis; }
+  else{
+    const mirip = Array.from(adaDesa.values()).find(g=> miripGampong(normTeks(g), normTeks(o.desa)));
+    if(mirip && confirm(`Gampong "${o.desa}" mirip dengan "${mirip}" yang sudah tersimpan di ${o.kecamatan}.\n\nOK = pakai "${mirip}"\nBatal = tetap "${o.desa}" sebagai Gampong baru`)) o.desa = mirip;
+  }
+  const inpDesa = document.getElementById('f-desa'+sfx); if(inpDesa) inpDesa.value = o.desa;
+  if(denganNik && !/^\d{16}$/.test(o.nik)) throw new FieldError('f-nik'+sfx, o.nik ? 'NIK harus 16 digit angka' : 'Isi NIK pemilik (16 digit)');
   return o;
 }
 // Pakai pemilik yang sudah ada (nama + desa + kecamatan sama), atau daftarkan otomatis.
@@ -1444,15 +1711,18 @@ async function simpanPemilikJikaBaru(o){
   let id = ada?.id || '';
   if(!ada){
     const ref = await db.collection('peternak').add({
-      nama: o.nama, desa: o.desa, kecamatan: o.kecamatan, alamat: o.alamat,
-      noHp: '', nik: '',
+      nama: o.nama, desa: o.desa, kecamatan: o.kecamatan,
+      noHp: '', nik: o.nik || '',
       createdAt: firebase.firestore.FieldValue.serverTimestamp(),
       createdBy: currentUser.uid
     });
     id = ref.id;
     catatAudit('tambah', 'peternak', id, `Pemilik baru "${o.nama}" (${o.desa}, ${o.kecamatan}) terdaftar otomatis dari form entri`);
+  }else if(o.nik && !ada.nik){
+    // lengkapi NIK pemilik lama (diabaikan diam-diam bila tidak berhak mengubah)
+    try{ await db.collection('peternak').doc(id).update({nik: o.nik}); }catch(err){ console.warn('NIK pemilik tidak diperbarui:', err.message); }
   }
-  return { namaPeternak: o.nama, kecamatan: o.kecamatan, desa: o.desa, alamatPemilik: o.alamat, peternakId: id };
+  return { namaPeternak: o.nama, kecamatan: o.kecamatan, desa: o.desa, peternakId: id, ...(o.nik ? {nik: o.nik} : {}) };
 }
 
 function petugasFieldHtml(rec={}){
@@ -1460,13 +1730,216 @@ function petugasFieldHtml(rec={}){
   return `<div class="field"><label>Petugas Pelaksana</label><input id="f-petugas" value="${escapeHtml(nama)}" readonly></div>`;
 }
 
-function perbaruiStatHewan(){
-  const el = document.getElementById('stat-ternak');
-  if(!el) return;
-  const jml = pelayananCache.filter(p=>p.jenisLayanan!=='Pemeriksaan Kesehatan').reduce((a,b)=>a+(Number(b.jumlahTernak)||0),0)
-    + vaksinasiCache.reduce((a,b)=>a+(Number(b.jumlahTernak)||0),0);
-  el.textContent = jml.toLocaleString('id-ID');
+/* =========================================================
+   DASHBOARD: populasi, deteksi PHMS, status Gampong, grafik
+========================================================= */
+const PHMS_JENDELA_HARI = 14; // kasus dihitung "aktif" selama 14 hari terakhir
+// Daftar PHMS yang dikenali dari tulisan Diagnosa / Hasil Konsultasi.
+// Tambah atau ubah baris di sini kalau ada penyakit yang perlu dikenali.
+const PHMS_DAFTAR = [
+  {nama:'PMK (Penyakit Mulut dan Kuku)', re:/\bPMK\b|mulut\s*(dan|&)?\s*kuku|foot\s*and\s*mouth|\bFMD\b/i},
+  {nama:'LSD (Lumpy Skin Disease)', re:/\bLSD\b|lumpy|dermatitis\s*nodular|kulit\s*berbenjol/i},
+  {nama:'SE (Septicaemia Epizootica/Ngorok)', re:/\bSE\b|septic(a)?emia|septikemia|ngorok/i},
+  {nama:'Brucellosis', re:/brucell|keluron\s*menular/i},
+  {nama:'Anthrax (Antraks)', re:/anthrax|antraks/i},
+  {nama:'Rabies', re:/rabies|anjing\s*gila/i},
+  {nama:'AI (Avian Influenza)', re:/\bAI\b|\bHPAI\b|avian|flu\s*burung|influenza\s*unggas/i},
+  {nama:'ND (Newcastle Disease)', re:/\bND\b|newcastle|tetelo/i},
+  {nama:'Jembrana', re:/jembrana/i},
+  {nama:'ASF (African Swine Fever)', re:/\bASF\b|african\s*swine/i},
+  {nama:'Hog Cholera (CSF)', re:/hog\s*cholera|\bCSF\b|classical\s*swine/i},
+];
+
+// Populasi ternak per spesies (total 3 kecamatan). Nilai bawaan = tabel Jumlah Populasi Ternak Tahun 2025.
+// Admin dapat memperbarui di menu Pengaturan > Data Populasi Ternak.
+const POPULASI_SPESIES = ['Kerbau','Sapi','Kambing','Domba','Kelinci','Ayam Buras','Ayam Ras Pedaging','Ayam Ras Petelur','Merpati','Burung Puyuh','Itik','Itik Manila'];
+const POPULASI_BAWAAN = {tahun:2025, data:{
+  'Kerbau':3696, 'Sapi':4341, 'Kambing':2270, 'Domba':270, 'Kelinci':0,
+  'Ayam Buras':20635, 'Ayam Ras Pedaging':13930, 'Ayam Ras Petelur':0,
+  'Merpati':49, 'Burung Puyuh':0, 'Itik':4861, 'Itik Manila':1187
+}};
+let populasiTernak = JSON.parse(JSON.stringify(POPULASI_BAWAAN));
+
+async function muatPopulasi(){
+  try{
+    const doc = await db.collection('pengaturan_aplikasi').doc('populasi').get();
+    if(doc.exists && doc.data().data) populasiTernak = {tahun: doc.data().tahun || POPULASI_BAWAAN.tahun, data: doc.data().data};
+  }catch(err){ console.warn('Gagal memuat data populasi:', err.message); }
+  isiFormPopulasi();
+  renderDashboard();
 }
+function isiFormPopulasi(){
+  const box = document.getElementById('form-populasi');
+  if(!box) return;
+  box.innerHTML = `
+    <div class="field"><label>Tahun Data</label><input type="number" id="pop-tahun" value="${escapeHtml(populasiTernak.tahun)}" min="2000"></div>
+    <div class="row2">${POPULASI_SPESIES.map((s,i)=>`
+      <div class="field"><label>${escapeHtml(s)}</label><input type="number" id="pop-${i}" min="0" value="${Number(populasiTernak.data[s])||0}"></div>`).join('')}
+    </div>`;
+}
+document.getElementById('btn-save-populasi')?.addEventListener('click', async ()=>{
+  const tahun = Number(gv('pop-tahun')) || new Date().getFullYear();
+  const data = {};
+  POPULASI_SPESIES.forEach((s,i)=>{ data[s] = Math.max(0, Number(document.getElementById('pop-'+i)?.value) || 0); });
+  try{
+    await db.collection('pengaturan_aplikasi').doc('populasi').set({tahun, data, diubahOleh: currentUser.uid, diubahPada: firebase.firestore.FieldValue.serverTimestamp()});
+    populasiTernak = {tahun, data};
+    catatAudit('ubah', 'pengaturan_aplikasi', 'populasi', `Memperbarui data populasi ternak tahun ${tahun}`);
+    renderDashboard();
+    showToast('Data populasi ternak disimpan');
+  }catch(err){
+    showToast('Gagal menyimpan: ' + err.message, true);
+  }
+});
+
+function cocokPHMS(teks){
+  return teks ? PHMS_DAFTAR.filter(d=>d.re.test(teks)).map(d=>d.nama) : [];
+}
+// Status kasus satu catatan: 'Tertular' (terkonfirmasi) atau 'Suspect' (dugaan, belum terkonfirmasi).
+// Catatan lama yang belum punya isian status dibaca dari tulisan diagnosa dan dianggap Tertular.
+function infoPHMS(p){
+  const teks = [p.jenisPenyakit, p.hasilKonsultasi].filter(Boolean).join(' ; ');
+  if(p.statusPHMS === 'Tidak') return null;
+  if(p.statusPHMS === 'Suspect' || p.statusPHMS === 'Tertular'){
+    const nama = p.penyakitPHMS ? [p.penyakitPHMS] : cocokPHMS(teks);
+    return {status: p.statusPHMS, penyakit: nama.length ? nama : ['PHMS (penyakit belum dipilih)']};
+  }
+  const nama = cocokPHMS(teks);
+  return nama.length ? {status:'Tertular', penyakit:nama} : null;
+}
+
+function deteksiPHMS(){
+  const batas = new Date(); batas.setHours(0,0,0,0);
+  batas.setDate(batas.getDate() - (PHMS_JENDELA_HARI - 1));
+  const penyakit = {}; // nama -> {Tertular:{kasus,ekor}, Suspect:{kasus,ekor}, gampong:Set, terakhir}
+  const gampong = {};  // kunci -> {desa, kec, status, penyakit:Set, terakhir}
+  pelayananCache.forEach(p=>{
+    if(p.jenisLayanan === 'Pemeriksaan Kesehatan') return;
+    const dt = p.tanggal?.toDate ? p.tanggal.toDate() : new Date(p.tanggal);
+    if(isNaN(dt) || dt < batas) return;
+    const info = infoPHMS(p);
+    if(!info) return;
+    const o = ownerPrefill(p);
+    const desa = gampongKanon(o.kecamatan, o.desa) || '(desa belum tercatat)';
+    const gKey = normTeks(o.kecamatan) + '|' + normTeks(desa);
+    if(!gampong[gKey]) gampong[gKey] = {desa, kec:o.kecamatan, status:'Suspect', penyakit:new Set(), terakhir:dt};
+    const g = gampong[gKey];
+    if(info.status === 'Tertular') g.status = 'Tertular';
+    if(dt > g.terakhir) g.terakhir = dt;
+    info.penyakit.forEach(nama=>{
+      if(!penyakit[nama]) penyakit[nama] = {Tertular:{ids:new Set(),ekor:0}, Suspect:{ids:new Set(),ekor:0}, gampong:new Set(), terakhir:dt};
+      const x = penyakit[nama];
+      x[info.status].ids.add(p.entriId || p.id); x[info.status].ekor += Number(p.jumlahTernak)||0;
+      x.gampong.add(desa);
+      if(dt > x.terakhir) x.terakhir = dt;
+      g.penyakit.add(nama);
+    });
+  });
+  return {penyakit, gampong};
+}
+const labelStatusPHMS = (st)=> st === 'Suspect' ? `Suspect ${PHMS_JENDELA_HARI}` : 'Tertular';
+const tagStatusPHMS = (st)=> `<span class="tag tag-${st.toLowerCase()}">${labelStatusPHMS(st)}</span>`;
+
+function renderDashboard(){
+  _petaGampong = null;
+  if(!document.getElementById('card-populasi')) return;
+
+  // 1. Populasi per spesies: nama spesies + jumlah total saja
+  const daftar = POPULASI_SPESIES.map(s=>[s, Number(populasiTernak.data[s])||0]).filter(([,n])=>n>0);
+  document.getElementById('populasi-sub').textContent = `Total populasi per spesies di 3 kecamatan · Tahun ${populasiTernak.tahun}`;
+  document.getElementById('populasi-list').innerHTML = daftar.length
+    ? daftar.map(([j,n])=>`<div class="pop-item"><span>${escapeHtml(j)}</span><b>${n.toLocaleString('id-ID')}</b></div>`).join('')
+    : '<div class="dash-empty">Belum ada data populasi.</div>';
+
+  // 2 & 3. Warning PHMS + status Gampong
+  const {penyakit, gampong} = deteksiPHMS();
+  const namaPenyakit = Object.keys(penyakit);
+  const adaKasus = namaPenyakit.length > 0;
+  const adaTertular = namaPenyakit.some(n=>penyakit[n].Tertular.ids.size > 0);
+
+  const cardPhms = document.getElementById('card-phms');
+  cardPhms.classList.toggle('alert-red', adaKasus);
+  cardPhms.classList.toggle('ok-green', !adaKasus);
+  document.getElementById('phms-body').innerHTML = adaKasus
+    ? `<div class="big-status">⚠️ WASPADA: ${adaTertular ? 'Terdeteksi kasus PHMS' : 'Dugaan (suspect) kasus PHMS'}</div>
+       <ul class="dash-list">${namaPenyakit.map(n=>{
+          const x = penyakit[n];
+          const bagian = ['Tertular','Suspect'].filter(st=>x[st].ids.size > 0)
+            .map(st=>`${tagStatusPHMS(st)} ${x[st].ids.size} kasus (${x[st].ekor} ekor)`).join(' &nbsp; ');
+          return `<li><b>${escapeHtml(n)}</b><br>${bagian}<br><span class="sub-text">Gampong: ${escapeHtml(Array.from(x.gampong).join(', '))} · terakhir ${fmtDate(x.terakhir)}</span></li>`;
+        }).join('')}</ul>`
+    : `<div class="big-status">✅ Tidak ada kasus PHMS terdeteksi</div>`;
+
+  const cardStatus = document.getElementById('card-status');
+  cardStatus.classList.toggle('alert-red', adaKasus);
+  cardStatus.classList.toggle('ok-green', !adaKasus);
+  const gList = Object.values(gampong).sort((a,b)=>(a.status===b.status ? b.terakhir-a.terakhir : (a.status==='Tertular' ? -1 : 1)));
+  const adaGTertular = gList.some(g=>g.status==='Tertular'), adaGSuspect = gList.some(g=>g.status==='Suspect');
+  const judulStatus = [adaGTertular ? 'Tertular' : '', adaGSuspect ? `Suspect ${PHMS_JENDELA_HARI}` : ''].filter(Boolean).join(', ');
+  document.getElementById('status-body').innerHTML = adaKasus
+    ? `<div class="big-status">${judulStatus}</div>
+       <ul class="dash-list">${gList.map(g=>`<li>${tagStatusPHMS(g.status)} <b>${escapeHtml(g.desa)}</b>${g.kec?` <span class="sub-text">(${escapeHtml(g.kec)})</span>`:''}<br><span class="sub-text">${escapeHtml(Array.from(g.penyakit).join(', '))} · terakhir ${fmtDate(g.terakhir)}</span></li>`).join('')}</ul>`
+    : `<div class="big-status">Bebas</div><div class="dash-note">Tidak ada Gampong tertular atau suspect.</div>`;
+  document.querySelectorAll('.phms-jendela').forEach(e=> e.textContent = PHMS_JENDELA_HARI);
+
+  // 4. Grafik
+  renderGrafik();
+}
+
+function renderGrafik(){
+  const wrap = document.getElementById('grafik-wrap');
+  if(!wrap) return;
+  const sel = document.getElementById('grafik-tahun');
+  if(sel && !sel.options.length){
+    const y = new Date().getFullYear();
+    for(let i = y; i >= y-5; i--) sel.innerHTML += `<option>${i}</option>`;
+    sel.addEventListener('change', renderGrafik);
+  }
+  const tahun = Number(sel?.value) || new Date().getFullYear();
+  const obat = Array(12).fill(0), vak = Array(12).fill(0);
+  pelayananCache.forEach(p=>{
+    if(p.jenisLayanan !== 'Pengobatan') return;
+    const d = p.tanggal?.toDate ? p.tanggal.toDate() : new Date(p.tanggal);
+    if(d.getFullYear() === tahun) obat[d.getMonth()] += Number(p.jumlahTernak)||0;
+  });
+  vaksinasiCache.forEach(v=>{
+    const d = v.tanggal?.toDate ? v.tanggal.toDate() : new Date(v.tanggal);
+    if(d.getFullYear() === tahun) vak[d.getMonth()] += Number(v.jumlahTernak)||0;
+  });
+  const totObat = obat.reduce((a,b)=>a+b,0), totVak = vak.reduce((a,b)=>a+b,0);
+  document.getElementById('grafik-total').innerHTML =
+    `Total ${tahun}: <b style="color:#2F5233">Pengobatan ${totObat.toLocaleString('id-ID')} ekor</b> · <b style="color:#9C6D2B">Vaksinasi ${totVak.toLocaleString('id-ID')} ekor</b>`;
+
+  const maks = Math.max(4, ...obat, ...vak);
+  let langkah = Math.ceil(maks/4);
+  const pangkat = Math.pow(10, Math.floor(Math.log10(langkah)));
+  const n = langkah / pangkat;
+  langkah = (n<=1 ? 1 : n<=2 ? 2 : n<=5 ? 5 : 10) * pangkat;
+  const atas = langkah * 4;
+
+  const W = 720, H = 250, ml = 42, mr = 10, mt = 16, mb = 28;
+  const pw = W-ml-mr, ph = H-mt-mb, gw = pw/12, bw = gw*0.32;
+  const bulan = ['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Agu','Sep','Okt','Nov','Des'];
+  const y = (v)=> mt + ph - (v/atas)*ph;
+  let svg = `<svg viewBox="0 0 ${W} ${H}" width="100%" role="img" aria-label="Grafik pengobatan dan vaksinasi per bulan ${tahun}" style="display:block;">`;
+  for(let i=0;i<=4;i++){
+    const v = langkah*i, yy = y(v);
+    svg += `<line x1="${ml}" x2="${W-mr}" y1="${yy}" y2="${yy}" stroke="#E5E1D3" stroke-width="1"/>`;
+    svg += `<text x="${ml-6}" y="${yy+3}" text-anchor="end" font-size="10" fill="#7A776C">${v.toLocaleString('id-ID')}</text>`;
+  }
+  for(let m=0;m<12;m++){
+    const gx = ml + m*gw + gw/2;
+    [[obat[m], '#2F5233', 'Pengobatan', -bw-1], [vak[m], '#C08A3E', 'Vaksinasi', 1]].forEach(([val, warna, nama, off])=>{
+      const h = (val/atas)*ph, x = gx + off;
+      svg += `<rect x="${x}" y="${mt+ph-h}" width="${bw}" height="${Math.max(h,0)}" rx="2" fill="${warna}"><title>${nama} ${bulan[m]} ${tahun}: ${val} ekor</title></rect>`;
+      if(val>0) svg += `<text x="${x+bw/2}" y="${mt+ph-h-3}" text-anchor="middle" font-size="9" fill="#262622">${val}</text>`;
+    });
+    svg += `<text x="${gx}" y="${H-10}" text-anchor="middle" font-size="10.5" fill="#7A776C">${bulan[m]}</text>`;
+  }
+  svg += '</svg>';
+  wrap.innerHTML = svg;
+}
+
 
 /* =========================================================
    8. MODUL: PELAYANAN
@@ -1478,13 +1951,7 @@ function initPelayananListener(){
     snap.forEach(d=> pelayananCache.push({id:d.id, ...d.data()}));
     renderPelayananTable(pelayananCache);
     renderDashboardRecent();
-    const thisMonth = new Date().getMonth(), thisYear = new Date().getFullYear();
-    const count = pelayananCache.filter(p=>{
-      const dt = p.tanggal?.toDate ? p.tanggal.toDate() : new Date(p.tanggal);
-      return dt.getMonth()===thisMonth && dt.getFullYear()===thisYear;
-    }).length;
-    document.getElementById('stat-pelayanan').textContent = count;
-    perbaruiStatHewan();
+    renderDashboard();
   }, err=> showToast('Gagal memuat data pelayanan: '+err.message, true));
 }
 function renderPelayananTable(list){
@@ -1496,7 +1963,7 @@ function renderPelayananTable(list){
     const linkAman = /^https?:\/\//i.test(p.linkLaporanPdf||'') ? escapeHtml(p.linkLaporanPdf) : '';
     const kolomTernak = isPemeriksaan
       ? (linkAman ? `<a href="${linkAman}" target="_blank" rel="noopener" style="color:var(--accent-dark); font-weight:600;">📄 Lihat PDF</a>` : '-')
-      : `${escapeHtml(p.jenisTernak)||'-'} ${p.jumlahTernak?('('+escapeHtml(p.jumlahTernak)+' ekor)'):''}${p.jenisPenyakit ? `<br><span class="sub-text">${escapeHtml(p.jenisPenyakit)}</span>` : ''}`;
+      : `${escapeHtml(p.jenisTernak)||'-'}${p.jumlahTernak ? ` (${escapeHtml(fmtEkorSexDlmKurung(p))})` : ''}${p.jenisPenyakit ? `<br><span class="sub-text">${escapeHtml(p.jenisPenyakit)}</span>` : ''}${(p.statusPHMS==='Suspect' || p.statusPHMS==='Tertular') ? `<br>${tagStatusPHMS(p.statusPHMS)} <span class="sub-text">${escapeHtml(p.penyakitPHMS||'')}</span>` : ''}${(p.jenisLayanan==='Konsultasi' && p.hasilKonsultasi) ? `<br><span class="sub-text">Hasil: ${escapeHtml(p.hasilKonsultasi.slice(0,70))}${p.hasilKonsultasi.length>70?'…':''}</span>` : ''}`;
     return `
     <tr>
       <td>${fmtDate(p.tanggal)}</td>
@@ -1520,16 +1987,20 @@ document.getElementById('search-pelayanan').addEventListener('input', (e)=>{
 function ambilKecamatanTerpilih(){
   return Array.from(document.querySelectorAll('.chk-kecamatan-kegiatan:checked')).map(el=>el.value).join(', ');
 }
-function pelayananFormHtml(p={}){
+function pelayananFormHtml(p={}, edit=false){
+  const cocokAwal = cocokPHMS([p.jenisPenyakit, p.hasilKonsultasi].filter(Boolean).join(' ; '));
+  const statusPhmsAwal = p.statusPHMS || (cocokAwal.length ? 'Tertular' : 'Tidak');
+  const penyakitPhmsAwal = p.penyakitPHMS || cocokAwal[0] || '';
   const terpilih = (p.kecamatanKegiatan||'').split(',').map(x=>x.trim());
   return `<div class="form-stack">
+    <div class="form-note">Kotak bertanda <span class="req">*</span> wajib diisi.</div>
     <div class="field"><label>Tanggal Pelayanan <span class="req">*</span></label>
       <input type="date" id="f-tglpelayanan" value="${tglInputValue(p.tanggal)}">
     </div>
 
     <div id="blok-pemilik" class="form-stack">
       ${ownerFormHtml('', p)}
-      ${hewanFormHtml('', p)}
+      ${hewanBlokHtml('', p, false, edit)}
     </div>
 
     <div class="row2">
@@ -1543,7 +2014,7 @@ function pelayananFormHtml(p={}){
 
     <div id="blok-kegiatan" class="form-stack" style="display:none;">
       <div class="field"><label>Nama Kegiatan <span class="req">*</span></label>
-        <input id="f-namakegiatan" value="${escapeHtml(p.namaKegiatan)}" placeholder="Contoh: Pemeriksaan Kesehatan Hewan Serentak">
+        <input id="f-namakegiatan" value="${escapeHtml(p.namaKegiatan)}" placeholder="Wajib diisi — contoh: Pemeriksaan Kesehatan Hewan Serentak">
       </div>
       <div class="field"><label>Kecamatan (bisa lebih dari satu) <span class="req">*</span></label>
         <div class="chk-group">
@@ -1552,22 +2023,41 @@ function pelayananFormHtml(p={}){
         </div>
       </div>
       <div class="field"><label>Link Laporan PDF (Google Drive) <span class="req">*</span></label>
-        <input id="f-linkpdf" value="${escapeHtml(p.linkLaporanPdf)}" placeholder="https://drive.google.com/...">
+        <input id="f-linkpdf" value="${escapeHtml(p.linkLaporanPdf)}" placeholder="Wajib diisi — tempel link https://drive.google.com/...">
       </div>
     </div>
 
     <div id="blok-klinis" class="form-stack">
       <div class="field" id="wrap-anamnesa"><label>Anamnesa <span class="req">*</span></label>
-        <textarea id="f-anamnesa" rows="2" placeholder="Keluhan/riwayat yang disampaikan pemilik">${escapeHtml(p.anamnesa)}</textarea>
+        <textarea id="f-anamnesa" rows="2" placeholder="Wajib diisi — tulis keluhan/riwayat yang disampaikan pemilik">${escapeHtml(p.anamnesa)}</textarea>
       </div>
-      <div class="field"><label id="lbl-diagnosa">Diagnosa Penyakit <span class="req">*</span></label>
-        <textarea id="f-jenispenyakit" rows="2" placeholder="Contoh: Scabies, Diare, Cacingan">${escapeHtml(p.jenisPenyakit)}</textarea>
+      <div class="field" id="wrap-diagnosa"><label>Diagnosa Penyakit <span class="req">*</span></label>
+        <textarea id="f-jenispenyakit" rows="2" placeholder="Wajib diisi — contoh: Scabies, Diare, Cacingan">${escapeHtml(p.jenisLayanan==='Konsultasi' ? '' : p.jenisPenyakit)}</textarea>
       </div>
       <div class="field" id="wrap-terapi"><label>Obat yang Digunakan <span class="req">*</span></label>
-        <textarea id="f-terapi" rows="2" placeholder="Contoh: Ivermectin, Antibiotik, Vitamin B Kompleks">${escapeHtml(p.terapi)}</textarea>
+        <textarea id="f-terapi" rows="2" placeholder="Wajib diisi — contoh: Ivermectin, Antibiotik, Vitamin B Kompleks">${escapeHtml(p.terapi)}</textarea>
       </div>
-      <div class="field"><label>Status Pelayanan</label>
+      <div class="field" id="wrap-status"><label>Status Pelayanan</label>
         <select id="f-status">${opsiSelectHtml(STATUS_PELAYANAN, p.status)}</select>
+      </div>
+      <div class="field" id="wrap-jeniskonsultasi" style="display:none;"><label>Jenis Konsultasi <span class="req">*</span></label>
+        <select id="f-jeniskonsultasi">${opsiSelectHtml(JENIS_KONSULTASI, p.jenisLayanan==='Konsultasi' ? p.jenisPenyakit : '')}</select>
+      </div>
+      <div class="field" id="wrap-hasilkonsultasi" style="display:none;"><label>Hasil Konsultasi <span class="req">*</span></label>
+        <textarea id="f-hasilkonsultasi" rows="3" placeholder="Wajib diisi — tulis hasil/saran konsultasi yang diberikan kepada pemilik">${escapeHtml(p.hasilKonsultasi)}</textarea>
+      </div>
+    </div>
+
+    <div id="blok-phms" class="form-stack phms-box">
+      <div class="field"><label>Status Kasus PHMS</label>
+        <select id="f-statusphms" onchange="perbaruiPHMS()">
+          ${[['Tidak','Bukan kasus PHMS'],['Suspect','Suspect — dugaan, belum terkonfirmasi'],['Tertular','Tertular — terkonfirmasi']]
+            .map(([v,l])=>`<option value="${v}" ${statusPhmsAwal===v?'selected':''}>${l}</option>`).join('')}
+        </select>
+        <div class="hint" id="hint-phms"></div>
+      </div>
+      <div class="field" id="wrap-penyakitphms" style="display:none;"><label>Penyakit PHMS <span class="req">*</span></label>
+        <select id="f-penyakitphms">${opsiSelectHtml(PHMS_DAFTAR.map(d=>d.nama), penyakitPhmsAwal)}</select>
       </div>
     </div>
 
@@ -1586,81 +2076,108 @@ window.perbaruiFieldPelayanan = function(){
   tampilkan('wrap-sistem', !pemeriksaan);
   tampilkan('blok-klinis', !pemeriksaan);
   tampilkan('blok-kegiatan', pemeriksaan);
-  tampilkan('wrap-anamnesa', !konsultasi);
-  tampilkan('wrap-terapi', !konsultasi);
-  const lbl = document.getElementById('lbl-diagnosa');
-  if(lbl) lbl.innerHTML = (konsultasi ? 'Jenis Konsultasi' : 'Diagnosa Penyakit') + ' <span class="req">*</span>';
+  // Konsultasi: tanpa anamnesa/diagnosa/obat/status; diganti jenis & hasil konsultasi
+  ['wrap-anamnesa','wrap-diagnosa','wrap-terapi','wrap-status'].forEach(id=> tampilkan(id, !konsultasi));
+  ['wrap-jeniskonsultasi','wrap-hasilkonsultasi'].forEach(id=> tampilkan(id, konsultasi));
+  tampilkan('blok-phms', !pemeriksaan);
+  perbaruiPHMS();
+};
+window.perbaruiPHMS = function(){
+  const st = gv('f-statusphms');
+  tampilkan('wrap-penyakitphms', st === 'Suspect' || st === 'Tertular');
+  const hint = document.getElementById('hint-phms');
+  if(hint) hint.textContent = st === 'Suspect'
+    ? `Pilih Suspect bila ada laporan kematian/kasus dari warga yang belum bisa dibuktikan saat kroscek (misalnya bangkai sudah dikubur). Status berlaku ${PHMS_JENDELA_HARI} hari sejak tanggal pelayanan.`
+    : st === 'Tertular' ? 'Pilih Tertular bila kasus sudah terkonfirmasi (gejala klinis kuat atau hasil uji laboratorium).' : '';
 };
 
 // Kumpulkan & validasi isian form. Mengembalikan objek data, atau null kalau belum lengkap.
 async function kumpulDataPelayanan(){
   try{
-    const jenis = gv('f-jenislayanan');
-    if(!jenis) throw new Error('Jenis pelayanan wajib dipilih');
-    const tglStr = gv('f-tglpelayanan');
-    if(!tglStr) throw new Error('Tanggal pelayanan wajib diisi');
+    bersihkanError();
+    const jenis = wajib('f-jenislayanan', 'Pilih jenis pelayanan');
+    const tglStr = wajib('f-tglpelayanan', 'Isi tanggal pelayanan');
     const base = { jenisLayanan: jenis, tanggal: new Date(tglStr), catatan: gv('f-catatan') };
 
     if(jenis === 'Pemeriksaan Kesehatan'){
-      const d = { ...base, namaKegiatan: gv('f-namakegiatan'), kecamatanKegiatan: ambilKecamatanTerpilih(), linkLaporanPdf: gv('f-linkpdf') };
-      if(!d.namaKegiatan) throw new Error('Nama kegiatan wajib diisi');
-      if(!d.kecamatanKegiatan) throw new Error('Pilih minimal satu kecamatan');
-      if(!/^https?:\/\//i.test(d.linkLaporanPdf)) throw new Error('Link laporan PDF wajib diisi (diawali https://)');
-      return d;
+      const d = { ...base, namaKegiatan: wajib('f-namakegiatan', 'Isi nama kegiatan'), kecamatanKegiatan: ambilKecamatanTerpilih(), linkLaporanPdf: gv('f-linkpdf') };
+      if(!d.kecamatanKegiatan) throw new Error('Centang minimal satu kecamatan');
+      if(!/^https?:\/\//i.test(d.linkLaporanPdf)) throw new FieldError('f-linkpdf', 'Isi link laporan PDF (diawali https://)');
+      return { data: d, hewan: null };
     }
 
     const pemilik = bacaPemilik('');
-    const konsultasi = jenis === 'Konsultasi';
-    const d = {
-      ...base,
-      jenisTernak: gv('f-jenisternak'),
-      jumlahTernak: Number(gv('f-jumlahternak')) || 0,
-      sistemPelayanan: gv('f-sistem'),
-      anamnesa: konsultasi ? '' : gv('f-anamnesa'),
-      jenisPenyakit: gv('f-jenispenyakit'),
-      terapi: konsultasi ? '' : gv('f-terapi'),
-      status: gv('f-status'),
-    };
-    if(!d.jenisTernak) throw new Error('Jenis hewan wajib dipilih');
-    if(!d.jumlahTernak) throw new Error('Jumlah ekor wajib diisi');
-    if(!konsultasi && !d.anamnesa) throw new Error('Anamnesa wajib diisi');
-    if(!d.jenisPenyakit) throw new Error(konsultasi ? 'Jenis konsultasi wajib diisi' : 'Diagnosa penyakit wajib diisi');
-    if(!konsultasi && !d.terapi) throw new Error('Obat yang digunakan wajib diisi');
+    const hewan = bacaHewan('', false);
+    const d = { ...base, sistemPelayanan: gv('f-sistem') };
 
-    return { ...d, ...(await simpanPemilikJikaBaru(pemilik)) };
+    if(jenis === 'Konsultasi'){
+      d.jenisPenyakit = wajib('f-jeniskonsultasi', 'Pilih jenis konsultasi');
+      d.hasilKonsultasi = wajib('f-hasilkonsultasi', 'Isi hasil konsultasi');
+      d.anamnesa = ''; d.terapi = ''; d.status = 'Selesai';
+    }else{
+      d.anamnesa = wajib('f-anamnesa', 'Isi anamnesa/keluhan pemilik');
+      d.jenisPenyakit = wajib('f-jenispenyakit', 'Isi diagnosa penyakit');
+      d.terapi = wajib('f-terapi', 'Isi obat yang digunakan');
+      d.status = gv('f-status');
+      d.hasilKonsultasi = '';
+    }
+    d.statusPHMS = gv('f-statusphms') || 'Tidak';
+    d.penyakitPHMS = '';
+    if(d.statusPHMS !== 'Tidak') d.penyakitPHMS = wajib('f-penyakitphms', 'Pilih penyakit PHMS yang dicurigai/terkonfirmasi');
+    return { data: { ...d, ...(await simpanPemilikJikaBaru(pemilik)) }, hewan };
   }catch(err){
-    showToast(err.message, true);
+    tandaiError(err);
     return null;
   }
 }
+const idEntri = ()=> Date.now().toString(36) + Math.random().toString(36).slice(2,6);
+const ringkasHewan = (hewan)=> hewan.map(h=>`${h.jenis} ${h.jantan}♂ ${h.betina}♀`).join(', ');
 
 document.getElementById('btn-add-pelayanan').addEventListener('click', ()=>{
   openModal('Catat Pelayanan', pelayananFormHtml(), async ()=>{
-    const data = await kumpulDataPelayanan();
-    if(!data) return;
+    const hasil = await kumpulDataPelayanan();
+    if(!hasil) return;
+    const {data, hewan} = hasil;
     data.petugasNama = currentProfile?.nama || currentUser.email;
     data.petugasRole = currentProfile?.role || 'Admin';
     data.createdBy = currentUser.uid;
-    const refBaru = await db.collection('pelayanan').add(data);
-    catatAudit('tambah', 'pelayanan', refBaru.id, `Menambahkan pelayanan "${data.jenisLayanan}" untuk ${data.namaPeternak||data.namaKegiatan||'-'}`);
+    if(!hewan){
+      const refBaru = await db.collection('pelayanan').add(data);
+      catatAudit('tambah', 'pelayanan', refBaru.id, `Menambahkan pelayanan "${data.jenisLayanan}" untuk ${data.namaKegiatan||'-'}`);
+    }else{
+      // satu dokumen per spesies (jantan+betina), supaya aturan semua laporan tetap sama
+      const entriId = idEntri(), batch = db.batch();
+      let idPertama = '';
+      hewan.forEach(h=>{
+        const ref = db.collection('pelayanan').doc();
+        if(!idPertama) idPertama = ref.id;
+        batch.set(ref, { ...data, entriId, jenisTernak:h.jenis, jumlahTernak:h.jantan+h.betina, jantan:h.jantan, betina:h.betina });
+      });
+      await batch.commit();
+      catatAudit('tambah', 'pelayanan', idPertama, `Menambahkan pelayanan "${data.jenisLayanan}" untuk ${data.namaPeternak||'-'} (${ringkasHewan(hewan)})`);
+    }
     showToast('Data pelayanan tersimpan');
     closeModal();
   });
   perbaruiFieldPelayanan();
+  perbaruiSaran('');
 });
 window.editPelayanan = function(id){
   const p = pelayananCache.find(x=>x.id===id);
   if(!p) return;
   if(!(isAdminUser || bolehAksesStok || p.createdBy === currentUser.uid)){ showToast('Anda tidak berhak mengubah data ini', true); return; }
-  openModal('Ubah Pelayanan', pelayananFormHtml(p), async ()=>{
-    const data = await kumpulDataPelayanan();
-    if(!data) return;
-    await db.collection('pelayanan').doc(id).update(data);
+  openModal('Ubah Pelayanan', pelayananFormHtml(p, true), async ()=>{
+    const hasil = await kumpulDataPelayanan();
+    if(!hasil) return;
+    const {data, hewan} = hasil;
+    const h = hewan ? hewan[0] : null;
+    await db.collection('pelayanan').doc(id).update(h ? { ...data, jenisTernak:h.jenis, jumlahTernak:h.jantan+h.betina, jantan:h.jantan, betina:h.betina } : data);
     catatAudit('ubah', 'pelayanan', id, `Mengubah pelayanan "${data.jenisLayanan}" untuk ${data.namaPeternak||data.namaKegiatan||'-'}`);
     showToast('Data pelayanan diperbarui');
     closeModal();
   });
   perbaruiFieldPelayanan();
+  perbaruiSaran('');
 };
 window.deletePelayanan = async function(id){
   const p = pelayananCache.find(x=>x.id===id);
@@ -1692,28 +2209,21 @@ function initVaksinasiListener(){
     vaksinasiCache = [];
     snap.forEach(d=> vaksinasiCache.push({id:d.id, ...d.data()}));
     renderVaksinasiTable(vaksinasiCache);
-    const thisMonth = new Date().getMonth(), thisYear = new Date().getFullYear();
-    const count = vaksinasiCache.filter(v=>{
-      const dt = v.tanggal?.toDate ? v.tanggal.toDate() : new Date(v.tanggal);
-      return dt.getMonth()===thisMonth && dt.getFullYear()===thisYear;
-    }).length;
-    document.getElementById('stat-vaksinasi').textContent = count;
-    perbaruiStatHewan();
+    renderDashboard();
   }, err=> showToast('Gagal memuat data vaksinasi: '+err.message, true));
 }
 function renderVaksinasiTable(list){
   const tbody = document.getElementById('table-vaksinasi');
-  if(list.length===0){ tbody.innerHTML = '<tr><td class="empty-row" colspan="8">Belum ada data vaksinasi. Klik "+ Catat Vaksinasi" untuk mulai.</td></tr>'; return; }
+  if(list.length===0){ tbody.innerHTML = '<tr><td class="empty-row" colspan="7">Belum ada data vaksinasi. Klik "+ Catat Vaksinasi" untuk mulai.</td></tr>'; return; }
   tbody.innerHTML = list.map(v=>{
     const bolehEdit = isAdminUser || bolehAksesStok || v.createdBy === currentUser.uid;
     return `
     <tr>
       <td>${fmtDate(v.tanggal)}</td>
       <td><b>${escapeHtml(v.jenisVaksin)||'-'}</b>${v.merkVaksin ? `<br><span class="sub-text">${escapeHtml(v.merkVaksin)}</span>` : ''}</td>
-      <td>${selPemilikHtml(v)}</td>
+      <td>${selPemilikHtml(v)}${v.nik ? `<br><span class="sub-text">NIK ${escapeHtml(v.nik)}</span>` : ''}</td>
       <td>${escapeHtml(v.jenisHewan)||'-'}</td>
-      <td>${escapeHtml(v.jumlahTernak)||0} ekor</td>
-      <td>${escapeHtml(v.noBatch)||'-'}</td>
+      <td>${escapeHtml(fmtEkorSex(v))}</td>
       <td>${escapeHtml(v.petugasNama)||'-'}<br>${roleBadge(v.petugasRole)}</td>
       <td>${bolehEdit ? `<div class="row-actions">
         <button class="icon-btn" onclick="editVaksinasi('${v.id}')" title="Ubah">✏️</button>
@@ -1725,17 +2235,16 @@ function renderVaksinasiTable(list){
 document.getElementById('search-vaksinasi').addEventListener('input', (e)=>{
   const q = e.target.value.toLowerCase();
   renderVaksinasiTable(vaksinasiCache.filter(v =>
-    [v.jenisVaksin, v.namaPeternak, v.desa, v.merkVaksin].some(x=>(x||'').toLowerCase().includes(q))));
+    [v.jenisVaksin, v.namaPeternak, v.desa, v.merkVaksin, v.nik].some(x=>(x||'').toLowerCase().includes(q))));
 });
-function vaksinasiFormHtml(v={}){
-  // catatan lama menyimpan jenis hewan di field jenisHewan
-  const rec = { ...v, jenisTernak: v.jenisHewan };
+function vaksinasiFormHtml(v={}, edit=false){
   return `<div class="form-stack">
+    <div class="form-note">Kotak bertanda <span class="req">*</span> wajib diisi.</div>
     <div class="field"><label>Tanggal Vaksinasi <span class="req">*</span></label>
       <input type="date" id="f-tglvaksin" value="${tglInputValue(v.tanggal)}">
     </div>
-    ${ownerFormHtml('V', v)}
-    ${hewanFormHtml('V', rec)}
+    ${ownerFormHtml('V', v, true)}
+    ${hewanBlokHtml('V', v, true, edit)}
     <div class="row2">
       <div class="field"><label>Jenis Vaksin (Penyakit) <span class="req">*</span></label>
         <select id="f-jenisvaksin">${opsiSelectHtml(JENIS_VAKSIN, v.jenisVaksin)}</select>
@@ -1744,7 +2253,6 @@ function vaksinasiFormHtml(v={}){
         <input id="f-merkvaksin" value="${escapeHtml(v.merkVaksin)}" placeholder="Contoh: Medion, Vaksindo">
       </div>
     </div>
-    <div class="field"><label>No. Batch Vaksin</label><input id="f-batch" value="${escapeHtml(v.noBatch)}" placeholder="No. Batch"></div>
     ${petugasFieldHtml(v)}
     <div class="field"><label>Catatan</label>
       <textarea id="f-catatan" rows="2" placeholder="Catatan tambahan (opsional)">${escapeHtml(v.catatan)}</textarea>
@@ -1753,52 +2261,59 @@ function vaksinasiFormHtml(v={}){
 }
 async function kumpulDataVaksinasi(){
   try{
-    const tglStr = gv('f-tglvaksin');
-    if(!tglStr) throw new Error('Tanggal vaksinasi wajib diisi');
-    const pemilik = bacaPemilik('V');
+    bersihkanError();
+    const tglStr = wajib('f-tglvaksin', 'Isi tanggal vaksinasi');
+    const pemilik = bacaPemilik('V', true);
+    const hewan = bacaHewan('V', false);
     const d = {
       tanggal: new Date(tglStr),
-      jenisVaksin: gv('f-jenisvaksin'),
+      jenisVaksin: wajib('f-jenisvaksin', 'Pilih jenis vaksin (penyakit)'),
       merkVaksin: gv('f-merkvaksin'),
-      jenisHewan: gv('f-jenisternakV'),
-      jumlahTernak: Number(gv('f-jumlahternakV')) || 0,
-      noBatch: gv('f-batch'),
       catatan: gv('f-catatan'),
     };
-    if(!d.jenisHewan) throw new Error('Jenis hewan wajib dipilih');
-    if(!d.jumlahTernak) throw new Error('Jumlah ekor wajib diisi');
-    if(!d.jenisVaksin) throw new Error('Jenis vaksin wajib dipilih');
-    return { ...d, ...(await simpanPemilikJikaBaru(pemilik)) };
+    return { data: { ...d, ...(await simpanPemilikJikaBaru(pemilik)) }, hewan };
   }catch(err){
-    showToast(err.message, true);
+    tandaiError(err);
     return null;
   }
 }
+const rekamVaksin = (h)=> ({ jenisHewan:h.jenis, jumlahTernak:h.jantan+h.betina, jantan:h.jantan, betina:h.betina });
 document.getElementById('btn-add-vaksinasi').addEventListener('click', ()=>{
   openModal('Catat Vaksinasi', vaksinasiFormHtml(), async ()=>{
-    const data = await kumpulDataVaksinasi();
-    if(!data) return;
+    const hasil = await kumpulDataVaksinasi();
+    if(!hasil) return;
+    const {data, hewan} = hasil;
     data.petugasNama = currentProfile?.nama || currentUser.email;
     data.petugasRole = currentProfile?.role || 'Admin';
     data.createdBy = currentUser.uid;
-    const refBaru = await db.collection('vaksinasi').add(data);
-    catatAudit('tambah', 'vaksinasi', refBaru.id, `Menambahkan vaksinasi "${data.jenisVaksin}" untuk ${data.namaPeternak||'-'}`);
+    const entriId = idEntri(), batch = db.batch();
+    let idPertama = '';
+    hewan.forEach(h=>{
+      const ref = db.collection('vaksinasi').doc();
+      if(!idPertama) idPertama = ref.id;
+      batch.set(ref, { ...data, entriId, ...rekamVaksin(h) });
+    });
+    await batch.commit();
+    catatAudit('tambah', 'vaksinasi', idPertama, `Menambahkan vaksinasi "${data.jenisVaksin}" untuk ${data.namaPeternak||'-'} (${ringkasHewan(hewan)})`);
     showToast('Data vaksinasi tersimpan');
     closeModal();
   });
+  perbaruiSaran('V');
 });
 window.editVaksinasi = function(id){
   const v = vaksinasiCache.find(x=>x.id===id);
   if(!v) return;
   if(!(isAdminUser || bolehAksesStok || v.createdBy === currentUser.uid)){ showToast('Anda tidak berhak mengubah data ini', true); return; }
-  openModal('Ubah Vaksinasi', vaksinasiFormHtml(v), async ()=>{
-    const data = await kumpulDataVaksinasi();
-    if(!data) return;
-    await db.collection('vaksinasi').doc(id).update(data);
+  openModal('Ubah Vaksinasi', vaksinasiFormHtml(v, true), async ()=>{
+    const hasil = await kumpulDataVaksinasi();
+    if(!hasil) return;
+    const {data, hewan} = hasil;
+    await db.collection('vaksinasi').doc(id).update({ ...data, ...rekamVaksin(hewan[0]) });
     catatAudit('ubah', 'vaksinasi', id, `Mengubah vaksinasi "${data.jenisVaksin}" untuk ${data.namaPeternak||'-'}`);
     showToast('Data vaksinasi diperbarui');
     closeModal();
   });
+  perbaruiSaran('V');
 };
 window.deleteVaksinasi = async function(id){
   const v = vaksinasiCache.find(x=>x.id===id);
@@ -2199,9 +2714,7 @@ document.getElementById('btn-generate-laporan').addEventListener('click', ()=>{
     : 'Laporan Kegiatan Pelayanan Vaksinasi Hewan UPTD Puskeswan Wilayah II';
   document.getElementById('laporan-subjudul').textContent = `Periode: ${judulPeriode}`;
 
-  function cariAlamatPeternak(nama){
-    const p = peternakCache.find(x => x.nama === nama);
-    return p ? {desa: p.desa||'-', kecamatan: p.kecamatan||'-'} : {desa:'-', kecamatan:'-'};
+  function cariAlamatPeternak(nama, rec){ if(rec && (rec.kecamatan||rec.desa)) return {desa: gampongKanon(rec.kecamatan, rec.desa)||'-', kecamatan: rec.kecamatan||'-'}; const p = peternakCache.find(x => x.nama === nama); return p ? {desa: gampongKanon(p.kecamatan, p.desa)||'-', kecamatan: p.kecamatan||'-'} : {desa:'-', kecamatan:'-'};
   }
 
   // Rekapitulasi
@@ -2213,7 +2726,7 @@ document.getElementById('btn-generate-laporan').addEventListener('click', ()=>{
     const pivot = {};
     filtered.forEach(d=>{
       if(d.jenisLayanan === 'Pemeriksaan Kesehatan') return; // laporan berupa PDF terpisah, tidak masuk pivot
-      const alamat = cariAlamatPeternak(d.namaPeternak);
+      const alamat = cariAlamatPeternak(d.namaPeternak, d);
       const penyakit = d.jenisPenyakit || d.jenisLayanan || 'Lainnya';
       const spesies = d.jenisTernak || 'Lainnya';
       const key = alamat.kecamatan+'|'+alamat.desa+'|'+penyakit;
@@ -2277,11 +2790,11 @@ document.getElementById('btn-generate-laporan').addEventListener('click', ()=>{
     head.innerHTML = '<tr><th>No</th><th>Tanggal</th><th>Jenis Layanan</th><th>Anamnesa</th><th>Jenis Penyakit</th><th>Terapi</th><th>Pemilik/Kegiatan</th><th>Desa</th><th>Kecamatan</th><th>Hewan</th><th>Petugas</th><th>Lampiran</th></tr>';
     const barisHtml = filtered.map((p,i)=>{
       const isPemeriksaan = p.jenisLayanan === 'Pemeriksaan Kesehatan';
-      const alamat = cariAlamatPeternak(p.namaPeternak);
+      const alamat = cariAlamatPeternak(p.namaPeternak, p);
       const namaKolom = isPemeriksaan ? (p.namaKegiatan||'-') : (p.namaPeternak||'-');
       const desaKolom = isPemeriksaan ? '-' : alamat.desa;
       const kecKolom = isPemeriksaan ? (p.kecamatanKegiatan||'-') : alamat.kecamatan;
-      const ternakKolom = isPemeriksaan ? '-' : `${p.jenisTernak||'-'} (${p.jumlahTernak||0} ekor)`;
+      const ternakKolom = isPemeriksaan ? '-' : `${p.jenisTernak||'-'} (${fmtEkorSexDlmKurung(p)})`;
       const linkAman = /^https?:\/\//i.test(p.linkLaporanPdf||'') ? escapeHtml(p.linkLaporanPdf) : '';
       const linkKolom = linkAman ? `<a href="${linkAman}" target="_blank" rel="noopener">📄 Lihat PDF</a>` : '-';
       return `<tr><td>${i+1}</td><td>${fmtDate(p.tanggal)}</td><td>${escapeHtml(p.jenisLayanan)||'-'}</td><td>${escapeHtml(p.anamnesa)||'-'}</td><td>${escapeHtml(p.jenisPenyakit)||'-'}</td><td>${escapeHtml(p.terapi)||'-'}</td><td>${escapeHtml(namaKolom)}</td><td>${escapeHtml(desaKolom)}</td><td>${escapeHtml(kecKolom)}</td><td>${escapeHtml(ternakKolom)}</td><td>${escapeHtml(p.petugasNama)||'-'}</td><td>${linkKolom}</td></tr>`;
@@ -2297,8 +2810,8 @@ document.getElementById('btn-generate-laporan').addEventListener('click', ()=>{
   }else{
     head.innerHTML = '<tr><th>No</th><th>Tgl</th><th>Kecamatan</th><th>Gampong</th><th>Jenis Vaksinasi</th><th>Jenis Hewan</th><th>Pemilik</th><th>Jumlah</th><th>Petugas</th></tr>';
     const barisHtml = filtered.map((v,i)=>{
-      const alamat = cariAlamatPeternak(v.namaPeternak);
-      return `<tr><td>${i+1}</td><td>${fmtDate(v.tanggal)}</td><td>${escapeHtml(alamat.kecamatan)}</td><td>${escapeHtml(alamat.desa)}</td><td>${escapeHtml(v.jenisVaksin)||'-'}</td><td>${escapeHtml(v.jenisHewan)||'-'}</td><td>${escapeHtml(v.namaPeternak)||'-'}</td><td>${escapeHtml(v.jumlahTernak)||0} ekor</td><td>${escapeHtml(v.petugasNama)||'-'}</td></tr>`;
+      const alamat = cariAlamatPeternak(v.namaPeternak, v);
+      return `<tr><td>${i+1}</td><td>${fmtDate(v.tanggal)}</td><td>${escapeHtml(alamat.kecamatan)}</td><td>${escapeHtml(alamat.desa)}</td><td>${escapeHtml(v.jenisVaksin)||'-'}</td><td>${escapeHtml(v.jenisHewan)||'-'}</td><td>${escapeHtml(v.namaPeternak)||'-'}</td><td>${escapeHtml(fmtEkorSex(v))}</td><td>${escapeHtml(v.petugasNama)||'-'}</td></tr>`;
     });
     if(filtered.length){
       const {utama, ekor} = pisahBarisEkor(barisHtml);
@@ -2322,36 +2835,32 @@ document.getElementById('btn-generate-laporan').addEventListener('click', ()=>{
   showToast(`Menampilkan ${filtered.length} data`);
 });
 
-document.getElementById('btn-cetak-laporan').addEventListener('click', ()=>{
-  window.print();
-});
+document.getElementById('btn-cetak-laporan').addEventListener('click', ()=> cetakDengan('laporan'));
 
 document.getElementById('btn-excel-laporan').addEventListener('click', ()=>{
   if(!laporanFilteredData.length){ showToast('Tidak ada data untuk diunduh', true); return; }
-  function cariAlamatPeternakExcel(nama){
-    const p = peternakCache.find(x => x.nama === nama);
-    return p ? {desa: p.desa||'-', kecamatan: p.kecamatan||'-'} : {desa:'-', kecamatan:'-'};
+  function cariAlamatPeternakExcel(nama, rec){ if(rec && (rec.kecamatan||rec.desa)) return {desa: gampongKanon(rec.kecamatan, rec.desa)||'-', kecamatan: rec.kecamatan||'-'}; const p = peternakCache.find(x => x.nama === nama); return p ? {desa: gampongKanon(p.kecamatan, p.desa)||'-', kecamatan: p.kecamatan||'-'} : {desa:'-', kecamatan:'-'};
   }
   let rows;
   if(laporanJenisAktif==='pelayanan'){
     rows = laporanFilteredData.map((p,i)=>{
       const isPemeriksaan = p.jenisLayanan === 'Pemeriksaan Kesehatan';
-      const alamat = cariAlamatPeternakExcel(p.namaPeternak);
+      const alamat = cariAlamatPeternakExcel(p.namaPeternak, p);
       return {
         No: i+1, Tanggal: fmtDate(p.tanggal), 'Jenis Layanan': p.jenisLayanan||'-', Anamnesa: p.anamnesa||'-', 'Jenis Penyakit': p.jenisPenyakit||'-',
         Terapi: p.terapi||'-', 'Peternak/Nama Kegiatan': isPemeriksaan ? (p.namaKegiatan||'-') : (p.namaPeternak||'-'),
         Desa: isPemeriksaan ? '-' : alamat.desa, Kecamatan: isPemeriksaan ? (p.kecamatanKegiatan||'-') : alamat.kecamatan,
-        'Jenis Ternak': p.jenisTernak||'-', 'Jumlah Ternak': p.jumlahTernak||0,
+        'Jenis Ternak': p.jenisTernak||'-', 'Jumlah Ternak': p.jumlahTernak||0, '♂ Jantan': p.jantan||0, '♀ Betina': p.betina||0,
         Petugas: p.petugasNama||'-', Catatan: p.catatan||'', 'Link Laporan PDF': p.linkLaporanPdf||''
       };
     });
   }else{
     rows = laporanFilteredData.map((v,i)=>{
-      const alamat = cariAlamatPeternakExcel(v.namaPeternak);
+      const alamat = cariAlamatPeternakExcel(v.namaPeternak, v);
       return {
         No: i+1, Tanggal: fmtDate(v.tanggal), 'Jenis Vaksin': v.jenisVaksin||'-', 'Merk Vaksin': v.merkVaksin||'-',
         Peternak: v.namaPeternak||'-', Desa: alamat.desa, Kecamatan: alamat.kecamatan,
-        'Jumlah Ternak': v.jumlahTernak||0, 'No. Batch': v.noBatch||'-',
+        'Jumlah Ternak': v.jumlahTernak||0, '♂ Jantan': v.jantan||0, '♀ Betina': v.betina||0,
         Petugas: v.petugasNama||'-'
       };
     });
@@ -2423,9 +2932,7 @@ document.getElementById('btn-generate-petugaslaporan').addEventListener('click',
     const dt = tgl?.toDate ? tgl.toDate() : new Date(tgl);
     return dt >= startDate && dt <= endDate;
   }
-  function cariAlamatPeternakPetugas(nama){
-    const p = peternakCache.find(x => x.nama === nama);
-    return p ? {desa: p.desa||'-', kecamatan: p.kecamatan||'-'} : {desa:'-', kecamatan:'-'};
+  function cariAlamatPeternakPetugas(nama, rec){ if(rec && (rec.kecamatan||rec.desa)) return {desa: gampongKanon(rec.kecamatan, rec.desa)||'-', kecamatan: rec.kecamatan||'-'}; const p = peternakCache.find(x => x.nama === nama); return p ? {desa: gampongKanon(p.kecamatan, p.desa)||'-', kecamatan: p.kecamatan||'-'} : {desa:'-', kecamatan:'-'};
   }
   function pisahEkor(rowsArr){
     const JUMLAH_EKOR = 5;
@@ -2437,13 +2944,14 @@ document.getElementById('btn-generate-petugaslaporan').addEventListener('click',
   const dataVaksinasi = vaksinasiCache.filter(v => v.createdBy===uidPetugas && dalamPeriode(v.tanggal));
 
   const barisPelayanan = dataPelayanan.map((p,i)=>{
-    const alamat = cariAlamatPeternakPetugas(p.namaPeternak);
-    const ternakKolom = `${p.jenisTernak||'-'} (${p.jumlahTernak||0} ekor)`;
-    return `<tr><td>${i+1}</td><td>${fmtDate(p.tanggal)}</td><td>${escapeHtml(p.jenisLayanan)||'-'}</td><td>${escapeHtml(p.anamnesa)||'-'}</td><td>${escapeHtml(p.jenisPenyakit)||'-'}</td><td>${escapeHtml(p.terapi)||'-'}</td><td>${escapeHtml(p.namaPeternak)||'-'}</td><td>${escapeHtml(alamat.desa)}</td><td>${escapeHtml(alamat.kecamatan)}</td><td>${escapeHtml(ternakKolom)}</td></tr>`;
+    const alamat = cariAlamatPeternakPetugas(p.namaPeternak, p);
+    const ternakKolom = p.jenisTernak||'-';
+    const jumlahKolom = fmtEkorSex(p);
+    return `<tr><td>${i+1}</td><td>${fmtDate(p.tanggal)}</td><td>${escapeHtml(p.jenisLayanan)||'-'}</td><td>${escapeHtml(p.anamnesa)||'-'}</td><td>${escapeHtml(p.jenisPenyakit)||'-'}</td><td>${escapeHtml(p.terapi)||'-'}</td><td>${escapeHtml(p.namaPeternak)||'-'}</td><td>${escapeHtml(alamat.desa)}</td><td>${escapeHtml(alamat.kecamatan)}</td><td>${escapeHtml(ternakKolom)}</td><td>${escapeHtml(jumlahKolom)}</td></tr>`;
   });
   const barisVaksinasi = dataVaksinasi.map((v,i)=>{
-    const alamat = cariAlamatPeternakPetugas(v.namaPeternak);
-    return `<tr><td>${i+1}</td><td>${fmtDate(v.tanggal)}</td><td>${escapeHtml(alamat.kecamatan)}</td><td>${escapeHtml(alamat.desa)}</td><td>${escapeHtml(v.jenisVaksin)||'-'}</td><td>${escapeHtml(v.jenisHewan)||'-'}</td><td>${escapeHtml(v.namaPeternak)||'-'}</td><td>${escapeHtml(v.jumlahTernak)||0} ekor</td></tr>`;
+    const alamat = cariAlamatPeternakPetugas(v.namaPeternak, v);
+    return `<tr><td>${i+1}</td><td>${fmtDate(v.tanggal)}</td><td>${escapeHtml(alamat.kecamatan)}</td><td>${escapeHtml(alamat.desa)}</td><td>${escapeHtml(v.jenisVaksin)||'-'}</td><td>${escapeHtml(v.jenisHewan)||'-'}</td><td>${escapeHtml(v.namaPeternak)||'-'}</td><td>${escapeHtml(fmtEkorSex(v))}</td></tr>`;
   });
 
   const bodyPelayanan = document.getElementById('petugaslaporan-body-pelayanan');
@@ -2453,7 +2961,7 @@ document.getElementById('btn-generate-petugaslaporan').addEventListener('click',
     bodyPelayanan.innerHTML = utama.join('');
     bodyPelayananTail.innerHTML = ekor.join('');
   }else{
-    bodyPelayanan.innerHTML = '<tr><td class="empty-row" colspan="10">Tidak ada data pada periode ini</td></tr>';
+    bodyPelayanan.innerHTML = '<tr><td class="empty-row" colspan="11">Tidak ada data pada periode ini</td></tr>';
     bodyPelayananTail.innerHTML = '';
   }
 
@@ -2489,9 +2997,7 @@ function roleBadgeTeks(role){
   return role || '-';
 }
 
-document.getElementById('btn-cetak-petugaslaporan').addEventListener('click', ()=>{
-  window.print();
-});
+document.getElementById('btn-cetak-petugaslaporan').addEventListener('click', ()=> cetakDengan('petugas'));
 
 /* =========================================================
    11.5 REKAP PKH
@@ -2519,8 +3025,8 @@ function ambilDataMentahPKH(startDate, endDate){
     if(dt < startDate || dt > endDate) return;
     const peternak = peternakCache.find(x => x.nama === p.namaPeternak);
     hasil.push({
-      kecamatan: peternak?.kecamatan || '',
-      gampong: peternak?.desa || '',
+      kecamatan: (p.kecamatan || peternak?.kecamatan) || '',
+      gampong: gampongKanon(p.kecamatan || peternak?.kecamatan, p.desa || peternak?.desa) || '',
       diagnosa: p.jenisPenyakit || p.jenisLayanan || 'Lainnya',
       spesies: p.jenisTernak || 'Lainnya',
       jumlah: Number(p.jumlahTernak)||0,
@@ -2596,8 +3102,8 @@ function ambilDataVaksinasiPKH(startDate, endDate){
     const peternak = peternakCache.find(x => x.nama === v.namaPeternak);
     hasil.push({
       tanggal: dt,
-      kecamatan: peternak?.kecamatan || '',
-      gampong: peternak?.desa || '',
+      kecamatan: (v.kecamatan || peternak?.kecamatan) || '',
+      gampong: gampongKanon(v.kecamatan || peternak?.kecamatan, v.desa || peternak?.desa) || '',
       kode: kodePenyakitVaksin(v.jenisVaksin),
       spesies: v.jenisHewan || '',
       jumlah: Number(v.jumlahTernak)||0,
@@ -2737,7 +3243,8 @@ function renderPKH5(dataVaksin){
     return `<tr><td>${i+1}</td><td>${escapeHtml(r.kec)}</td><td>${escapeHtml(r.gam)}</td>${cells}<td><b>${jumlahBaris}</b></td></tr>`;
   }).join('') + (()=>{
     const grand = kolomList.reduce((a,ck)=>a+(totals[ck]||0),0);
-    return `<tr style="font-weight:800; background:var(--primary-dark); color:#fff;"><td colspan="3">JUMLAH</td>${kolomList.map(ck=>`<td>${totals[ck]||0}</td>`).join('')}<td>${grand}</td></tr>`;
+    return `<tr style="font-weight:800; background:var(--primary-dark); color:#fff;"><td colspan="3">JUMLAH</td>${kolomList.map(ck=>`<td>${totals[ck]||0}</td>`).join('')}<td>${grand}</td></tr>` +
+      `<tr style="font-weight:800; background:var(--primary-light);"><td colspan="3">TOTAL PER JENIS VAKSINASI</td>${DISEASE_MAP_PKH5.map(d=>`<td colspan="${d.animals.length}">${d.code}: ${d.animals.reduce((a,an)=>a+(totals[d.code+'|'+an]||0),0)}</td>`).join('')}<td>${grand}</td></tr>`;
   })();
 
   wrap.innerHTML = `<table><thead><tr><th rowspan="2">No</th><th rowspan="2">Kecamatan</th><th rowspan="2">Gampong</th>${DISEASE_MAP_PKH5.map(d=>`<th colspan="${d.animals.length}">${d.code}</th>`).join('')}<th rowspan="2">Jumlah</th></tr><tr>${DISEASE_MAP_PKH5.flatMap(d=>d.animals.map(a=>`<th>${a.toUpperCase()}</th>`)).join('')}</tr></thead><tbody>${body}</tbody></table>`;
@@ -2843,7 +3350,7 @@ document.getElementById('btn-generate-pkh')?.addEventListener('click', ()=>{
   showToast(`Rekap PKH ditampilkan (${dataMentah.length} data)`);
 });
 
-document.getElementById('btn-cetak-pkh')?.addEventListener('click', ()=> window.print());
+document.getElementById('btn-cetak-pkh')?.addEventListener('click', ()=> cetakDengan('pkh'));
 
 document.getElementById('btn-excel-pkh')?.addEventListener('click', ()=>{
   if(!pkhDataTerakhir.length){ showToast('Tidak ada data untuk diunduh', true); return; }
@@ -2951,6 +3458,9 @@ document.getElementById('btn-excel-pkh')?.addEventListener('click', ()=>{
     return row;
   });
   XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(pkh5Rows.length?pkh5Rows:[{Info:'Tidak ada data'}]), 'PKH-5');
+  const totalVaksinRows = DISEASE_MAP_PKH5.map(d=>({'Jenis Vaksinasi': d.code, Jumlah: pkh5Rows.reduce((a,r)=>a+d.animals.reduce((b,an)=>b+(r[d.code+'|'+an]||0),0),0)}));
+  totalVaksinRows.push({'Jenis Vaksinasi':'TOTAL', Jumlah: totalVaksinRows.reduce((a,r)=>a+r.Jumlah,0)});
+  XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(totalVaksinRows), 'PKH-5 Total Vaksin');
 
   XLSX.writeFile(wb, `Rekap_PKH_${pkhPeriodeTerakhir.replace(/\s+/g,'_')}.xlsx`);
   showToast('File Excel berhasil diunduh');
@@ -3019,7 +3529,7 @@ document.getElementById('btn-backup-data').addEventListener('click', ()=>{
 
     const pelayananRows = pelayananCache.map((p,i)=>({
       No: i+1, Tanggal: fmtDate(p.tanggal), 'Jenis Layanan': p.jenisLayanan||'-', Anamnesa: p.anamnesa||'-', Peternak: p.namaPeternak||'-',
-      'Jenis Ternak': p.jenisTernak||'-', 'Jumlah Ternak': p.jumlahTernak||0, Petugas: p.petugasNama||'-', Catatan: p.catatan||''
+      'Jenis Ternak': p.jenisTernak||'-', 'Jumlah Ternak': p.jumlahTernak||0, '♂ Jantan': p.jantan||0, '♀ Betina': p.betina||0, Petugas: p.petugasNama||'-', Catatan: p.catatan||''
     }));
     XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(pelayananRows.length?pelayananRows:[{Info:'Tidak ada data'}]), 'Pelayanan');
 
@@ -3213,6 +3723,7 @@ function initAllListeners(){
   initVaksinasiListener();
   if(bolehAksesStok) initStokListener();
   muatNamaKepalaUptd();
+  muatPopulasi();
   isiDropdownPetugasLaporan();
 }
 </script>
