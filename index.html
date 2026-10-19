@@ -430,6 +430,8 @@
       <ul class="nav-list">
         <li class="nav-item active" data-page="dashboard"><span class="ic">🏠</span> Dashboard</li>
         <li class="nav-item" data-page="pelayanan"><span class="ic">💉</span> Pelayanan</li>
+        <li class="nav-item" data-page="konsultasi"><span class="ic">💬</span> Konsultasi</li>
+        <li class="nav-item" data-page="pemeriksaan"><span class="ic">🩺</span> Pemeriksaan Kesehatan Hewan</li>
         <li class="nav-item" data-page="vaksinasi"><span class="ic">🦠</span> Vaksinasi</li>
         <li class="nav-item" id="nav-stokobat" data-page="stokobat"><span class="ic">💊</span> Stok Obat</li>
         <li class="nav-item" id="nav-stokalkeswan" data-page="stokalkeswan"><span class="ic">🧰</span> Stok Alkeswan</li>
@@ -531,6 +533,44 @@
               <table>
                 <thead><tr><th>Tanggal</th><th>Jenis Layanan</th><th>Pemilik</th><th>Hewan / Diagnosa</th><th>Petugas</th><th></th></tr></thead>
                 <tbody id="table-pelayanan"><tr><td class="empty-row" colspan="6">Memuat data...</td></tr></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- KONSULTASI -->
+        <div class="page" id="page-konsultasi">
+          <div class="panel">
+            <div class="section-head">
+              <h3>Konsultasi</h3>
+              <div style="display:flex; gap:10px; flex-wrap:wrap;">
+                <div class="search-box"><span class="ic">🔍</span><input type="text" id="search-konsultasi" placeholder="Cari jenis konsultasi, pemilik, desa..."></div>
+                <button class="btn btn-accent btn-sm" id="btn-add-konsultasi">+ Catat Konsultasi</button>
+              </div>
+            </div>
+            <div class="table-wrap">
+              <table>
+                <thead><tr><th>Tanggal</th><th>Jenis Konsultasi</th><th>Pemilik</th><th>Hewan</th><th>Hasil Konsultasi</th><th>Petugas</th><th></th></tr></thead>
+                <tbody id="table-konsultasi"><tr><td class="empty-row" colspan="7">Memuat data...</td></tr></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- PEMERIKSAAN KESEHATAN HEWAN -->
+        <div class="page" id="page-pemeriksaan">
+          <div class="panel">
+            <div class="section-head">
+              <h3>Pemeriksaan Kesehatan Hewan</h3>
+              <div style="display:flex; gap:10px; flex-wrap:wrap;">
+                <div class="search-box"><span class="ic">🔍</span><input type="text" id="search-pemeriksaan" placeholder="Cari nama kegiatan, kecamatan..."></div>
+                <button class="btn btn-accent btn-sm" id="btn-add-pemeriksaan">+ Catat Pemeriksaan</button>
+              </div>
+            </div>
+            <div class="table-wrap">
+              <table>
+                <thead><tr><th>Tanggal</th><th>Nama Kegiatan</th><th>Kecamatan</th><th>Laporan</th><th>Petugas</th><th></th></tr></thead>
+                <tbody id="table-pemeriksaan"><tr><td class="empty-row" colspan="6">Memuat data...</td></tr></tbody>
               </table>
             </div>
           </div>
@@ -1336,7 +1376,9 @@ auth.onAuthStateChanged(async (user)=>{
 ========================================================= */
 const pageTitles = {
   dashboard:['Dashboard','Ringkasan kegiatan Puskeswan Wilayah II'],
-  pelayanan:['Pelayanan','Entri pemilik, hewan, dan pelayanan dalam satu formulir'],
+  pelayanan:['Pelayanan','Pengobatan dan Bedah Minor: entri pemilik, hewan, dan pelayanan dalam satu formulir'],
+  konsultasi:['Konsultasi','Catatan konsultasi kepada pemilik hewan'],
+  pemeriksaan:['Pemeriksaan Kesehatan Hewan','Catatan kegiatan pemeriksaan kesehatan hewan'],
   vaksinasi:['Vaksinasi','Entri pemilik, hewan, dan vaksinasi dalam satu formulir'],
   stokobat:['Stok Obat','Kelola stok obat (dengan tanggal kadaluarsa)'],
   stokalkeswan:['Stok Alkeswan','Kelola stok alat kesehatan hewan'],
@@ -1485,7 +1527,7 @@ function bangunPetaGampong(){
     e.n++; e.raw[raw] = (e.raw[raw]||0) + 1; k.set(nm, e);
   };
   peternakCache.forEach(p=> tambah(p.kecamatan, p.desa));
-  pelayananCache.forEach(p=> { if(p.jenisLayanan !== 'Pemeriksaan Kesehatan') tambah(p.kecamatan, p.desa); });
+  pelayananSemua.forEach(p=> { if(p.jenisLayanan !== 'Pemeriksaan Kesehatan') tambah(p.kecamatan, p.desa); });
   vaksinasiCache.forEach(v=> tambah(v.kecamatan, v.desa));
   const peta = new Map();
   Object.keys(frek).forEach(kec=>{
@@ -1813,7 +1855,7 @@ function deteksiPHMS(){
   batas.setDate(batas.getDate() - (PHMS_JENDELA_HARI - 1));
   const penyakit = {}; // nama -> {Tertular:{kasus,ekor}, Suspect:{kasus,ekor}, gampong:Set, terakhir}
   const gampong = {};  // kunci -> {desa, kec, status, penyakit:Set, terakhir}
-  pelayananCache.forEach(p=>{
+  pelayananSemua.forEach(p=>{   // Pelayanan + Konsultasi
     if(p.jenisLayanan === 'Pemeriksaan Kesehatan') return;
     const dt = p.tanggal?.toDate ? p.tanggal.toDate() : new Date(p.tanggal);
     if(isNaN(dt) || dt < batas) return;
@@ -1942,261 +1984,384 @@ function renderGrafik(){
 
 
 /* =========================================================
-   8. MODUL: PELAYANAN
+   8. MODUL: PELAYANAN, KONSULTASI, PEMERIKSAAN KESEHATAN HEWAN
+   Ketiganya tersimpan di koleksi "pelayanan" (dibedakan lewat jenisLayanan) tetapi tampil di menu
+   sendiri-sendiri. pelayananCache hanya berisi Pengobatan/Bedah Minor, sehingga SEMUA laporan
+   pelayanan dan PKH otomatis hanya memuat pelayanan yang berhubungan dengan obat dan diagnosa.
+   Konsultasi dan Pemeriksaan Kesehatan akan punya laporan terpisah (format menyusul).
 ========================================================= */
+let pelayananSemua = [];
 let pelayananCache = [];
+let konsultasiCache = [];
+let pemeriksaanCache = [];
+const JENIS_PELAYANAN_FORM = ['Pengobatan','Bedah Minor'];
+
 function initPelayananListener(){
   db.collection('pelayanan').orderBy('tanggal','desc').onSnapshot(snap=>{
-    pelayananCache = [];
-    snap.forEach(d=> pelayananCache.push({id:d.id, ...d.data()}));
+    pelayananSemua = [];
+    snap.forEach(d=> pelayananSemua.push({id:d.id, ...d.data()}));
+    pelayananCache = pelayananSemua.filter(p=> p.jenisLayanan !== 'Konsultasi' && p.jenisLayanan !== 'Pemeriksaan Kesehatan');
+    konsultasiCache = pelayananSemua.filter(p=> p.jenisLayanan === 'Konsultasi');
+    pemeriksaanCache = pelayananSemua.filter(p=> p.jenisLayanan === 'Pemeriksaan Kesehatan');
     renderPelayananTable(pelayananCache);
+    renderKonsultasiTable(konsultasiCache);
+    renderPemeriksaanTable(pemeriksaanCache);
     renderDashboardRecent();
     renderDashboard();
   }, err=> showToast('Gagal memuat data pelayanan: '+err.message, true));
 }
+const bolehUbahPelayanan = (p)=> isAdminUser || bolehAksesStok || p.createdBy === currentUser.uid;
+function tombolAksiHtml(p, fnEdit){
+  return bolehUbahPelayanan(p) ? `<div class="row-actions">
+        <button class="icon-btn" onclick="${fnEdit}('${p.id}')" title="Ubah">✏️</button>
+        <button class="icon-btn del" onclick="deletePelayanan('${p.id}')" title="Hapus">🗑️</button>
+      </div>` : '';
+}
+const tagPhmsCatatan = (p)=> (p.statusPHMS==='Suspect' || p.statusPHMS==='Tertular')
+  ? `<br>${tagStatusPHMS(p.statusPHMS)} <span class="sub-text">${escapeHtml(p.penyakitPHMS||'')}</span>` : '';
+const hewanCatatanHtml = (p)=> `${escapeHtml(p.jenisTernak)||'-'}${p.jumlahTernak ? ` (${escapeHtml(fmtEkorSexDlmKurung(p))})` : ''}`;
+
 function renderPelayananTable(list){
   const tbody = document.getElementById('table-pelayanan');
   if(list.length===0){ tbody.innerHTML = '<tr><td class="empty-row" colspan="6">Belum ada data pelayanan. Klik "+ Catat Pelayanan" untuk mulai.</td></tr>'; return; }
-  tbody.innerHTML = list.map(p=>{
-    const isPemeriksaan = p.jenisLayanan === 'Pemeriksaan Kesehatan';
-    const kolomPeternak = isPemeriksaan ? escapeHtml(p.namaKegiatan||'-') : selPemilikHtml(p);
-    const linkAman = /^https?:\/\//i.test(p.linkLaporanPdf||'') ? escapeHtml(p.linkLaporanPdf) : '';
-    const kolomTernak = isPemeriksaan
-      ? (linkAman ? `<a href="${linkAman}" target="_blank" rel="noopener" style="color:var(--accent-dark); font-weight:600;">📄 Lihat PDF</a>` : '-')
-      : `${escapeHtml(p.jenisTernak)||'-'}${p.jumlahTernak ? ` (${escapeHtml(fmtEkorSexDlmKurung(p))})` : ''}${p.jenisPenyakit ? `<br><span class="sub-text">${escapeHtml(p.jenisPenyakit)}</span>` : ''}${(p.statusPHMS==='Suspect' || p.statusPHMS==='Tertular') ? `<br>${tagStatusPHMS(p.statusPHMS)} <span class="sub-text">${escapeHtml(p.penyakitPHMS||'')}</span>` : ''}${(p.jenisLayanan==='Konsultasi' && p.hasilKonsultasi) ? `<br><span class="sub-text">Hasil: ${escapeHtml(p.hasilKonsultasi.slice(0,70))}${p.hasilKonsultasi.length>70?'…':''}</span>` : ''}`;
-    return `
+  tbody.innerHTML = list.map(p=>`
     <tr>
       <td>${fmtDate(p.tanggal)}</td>
-      <td><b>${escapeHtml(p.jenisLayanan)||'-'}</b>${isPemeriksaan && p.kecamatanKegiatan ? `<br><span class="sub-text">${escapeHtml(p.kecamatanKegiatan)}</span>` : (p.sistemPelayanan ? `<br><span class="sub-text">${escapeHtml(p.sistemPelayanan)}</span>` : '')}</td>
-      <td>${kolomPeternak}</td>
-      <td>${kolomTernak}</td>
+      <td><b>${escapeHtml(p.jenisLayanan)||'-'}</b>${p.sistemPelayanan ? `<br><span class="sub-text">${escapeHtml(p.sistemPelayanan)}</span>` : ''}</td>
+      <td>${selPemilikHtml(p)}</td>
+      <td>${hewanCatatanHtml(p)}${p.jenisPenyakit ? `<br><span class="sub-text">${escapeHtml(p.jenisPenyakit)}</span>` : ''}${tagPhmsCatatan(p)}</td>
       <td>${escapeHtml(p.petugasNama)||'-'}<br>${roleBadge(p.petugasRole)}</td>
-      <td>${(isAdminUser || bolehAksesStok || p.createdBy === currentUser.uid) ? `<div class="row-actions">
-        <button class="icon-btn" onclick="editPelayanan('${p.id}')" title="Ubah">✏️</button>
-        <button class="icon-btn del" onclick="deletePelayanan('${p.id}')" title="Hapus">🗑️</button>
-      </div>` : ''}</td>
-    </tr>`;
-  }).join('');
+      <td>${tombolAksiHtml(p, 'editPelayanan')}</td>
+    </tr>`).join('');
 }
 document.getElementById('search-pelayanan').addEventListener('input', (e)=>{
   const q = e.target.value.toLowerCase();
-  renderPelayananTable(pelayananCache.filter(p =>
-    [p.jenisLayanan, p.namaPeternak, p.namaKegiatan, p.desa, p.jenisPenyakit].some(v=>(v||'').toLowerCase().includes(q))));
+  renderPelayananTable(pelayananCache.filter(p => [p.jenisLayanan, p.namaPeternak, p.desa, p.jenisPenyakit].some(v=>(v||'').toLowerCase().includes(q))));
 });
 
 function ambilKecamatanTerpilih(){
   return Array.from(document.querySelectorAll('.chk-kecamatan-kegiatan:checked')).map(el=>el.value).join(', ');
 }
-function pelayananFormHtml(p={}, edit=false){
+const idEntri = ()=> Date.now().toString(36) + Math.random().toString(36).slice(2,6);
+const ringkasHewan = (hewan)=> hewan.map(h=>`${h.jenis} ${h.jantan}♂ ${h.betina}♀`).join(', ');
+
+// Blok Status Kasus PHMS (dipakai form Pelayanan dan Konsultasi)
+function phmsBlokHtml(p={}){
   const cocokAwal = cocokPHMS([p.jenisPenyakit, p.hasilKonsultasi].filter(Boolean).join(' ; '));
-  const statusPhmsAwal = p.statusPHMS || (cocokAwal.length ? 'Tertular' : 'Tidak');
-  const penyakitPhmsAwal = p.penyakitPHMS || cocokAwal[0] || '';
-  const terpilih = (p.kecamatanKegiatan||'').split(',').map(x=>x.trim());
-  return `<div class="form-stack">
-    <div class="form-note">Kotak bertanda <span class="req">*</span> wajib diisi.</div>
-    <div class="field"><label>Tanggal Pelayanan <span class="req">*</span></label>
-      <input type="date" id="f-tglpelayanan" value="${tglInputValue(p.tanggal)}">
-    </div>
-
-    <div id="blok-pemilik" class="form-stack">
-      ${ownerFormHtml('', p)}
-      ${hewanBlokHtml('', p, false, edit)}
-    </div>
-
-    <div class="row2">
-      <div class="field"><label>Jenis Pelayanan <span class="req">*</span></label>
-        <select id="f-jenislayanan" onchange="perbaruiFieldPelayanan()">${opsiSelectHtml(JENIS_LAYANAN, p.jenisLayanan)}</select>
-      </div>
-      <div class="field" id="wrap-sistem"><label>Sistem Pelayanan</label>
-        <select id="f-sistem">${opsiSelectHtml(SISTEM_PELAYANAN, p.sistemPelayanan)}</select>
-      </div>
-    </div>
-
-    <div id="blok-kegiatan" class="form-stack" style="display:none;">
-      <div class="field"><label>Nama Kegiatan <span class="req">*</span></label>
-        <input id="f-namakegiatan" value="${escapeHtml(p.namaKegiatan)}" placeholder="Wajib diisi — contoh: Pemeriksaan Kesehatan Hewan Serentak">
-      </div>
-      <div class="field"><label>Kecamatan (bisa lebih dari satu) <span class="req">*</span></label>
-        <div class="chk-group">
-          ${KECAMATAN_DIIZINKAN.map(k=>`
-            <label><input type="checkbox" class="chk-kecamatan-kegiatan" value="${escapeHtml(k)}" ${terpilih.includes(k)?'checked':''}> ${escapeHtml(k)}</label>`).join('')}
-        </div>
-      </div>
-      <div class="field"><label>Link Laporan PDF (Google Drive) <span class="req">*</span></label>
-        <input id="f-linkpdf" value="${escapeHtml(p.linkLaporanPdf)}" placeholder="Wajib diisi — tempel link https://drive.google.com/...">
-      </div>
-    </div>
-
-    <div id="blok-klinis" class="form-stack">
-      <div class="field" id="wrap-anamnesa"><label>Anamnesa <span class="req">*</span></label>
-        <textarea id="f-anamnesa" rows="2" placeholder="Wajib diisi — tulis keluhan/riwayat yang disampaikan pemilik">${escapeHtml(p.anamnesa)}</textarea>
-      </div>
-      <div class="field" id="wrap-diagnosa"><label>Diagnosa Penyakit <span class="req">*</span></label>
-        <textarea id="f-jenispenyakit" rows="2" placeholder="Wajib diisi — contoh: Scabies, Diare, Cacingan">${escapeHtml(p.jenisLayanan==='Konsultasi' ? '' : p.jenisPenyakit)}</textarea>
-      </div>
-      <div class="field" id="wrap-terapi"><label>Obat yang Digunakan <span class="req">*</span></label>
-        <textarea id="f-terapi" rows="2" placeholder="Wajib diisi — contoh: Ivermectin, Antibiotik, Vitamin B Kompleks">${escapeHtml(p.terapi)}</textarea>
-      </div>
-      <div class="field" id="wrap-status"><label>Status Pelayanan</label>
-        <select id="f-status">${opsiSelectHtml(STATUS_PELAYANAN, p.status)}</select>
-      </div>
-      <div class="field" id="wrap-jeniskonsultasi" style="display:none;"><label>Jenis Konsultasi <span class="req">*</span></label>
-        <select id="f-jeniskonsultasi">${opsiSelectHtml(JENIS_KONSULTASI, p.jenisLayanan==='Konsultasi' ? p.jenisPenyakit : '')}</select>
-      </div>
-      <div class="field" id="wrap-hasilkonsultasi" style="display:none;"><label>Hasil Konsultasi <span class="req">*</span></label>
-        <textarea id="f-hasilkonsultasi" rows="3" placeholder="Wajib diisi — tulis hasil/saran konsultasi yang diberikan kepada pemilik">${escapeHtml(p.hasilKonsultasi)}</textarea>
-      </div>
-    </div>
-
-    <div id="blok-phms" class="form-stack phms-box">
+  const statusAwal = p.statusPHMS || (cocokAwal.length && p.jenisLayanan !== 'Konsultasi' ? 'Tertular' : 'Tidak');
+  const penyakitAwal = p.penyakitPHMS || cocokAwal[0] || '';
+  return `<div id="blok-phms" class="form-stack phms-box">
       <div class="field"><label>Status Kasus PHMS</label>
         <select id="f-statusphms" onchange="perbaruiPHMS()">
           ${[['Tidak','Bukan kasus PHMS'],['Suspect','Suspect — dugaan, belum terkonfirmasi'],['Tertular','Tertular — terkonfirmasi']]
-            .map(([v,l])=>`<option value="${v}" ${statusPhmsAwal===v?'selected':''}>${l}</option>`).join('')}
+            .map(([v,l])=>`<option value="${v}" ${statusAwal===v?'selected':''}>${l}</option>`).join('')}
         </select>
         <div class="hint" id="hint-phms"></div>
       </div>
       <div class="field" id="wrap-penyakitphms" style="display:none;"><label>Penyakit PHMS <span class="req">*</span></label>
-        <select id="f-penyakitphms">${opsiSelectHtml(PHMS_DAFTAR.map(d=>d.nama), penyakitPhmsAwal)}</select>
+        <select id="f-penyakitphms">${opsiSelectHtml(PHMS_DAFTAR.map(d=>d.nama), penyakitAwal)}</select>
+      </div>
+    </div>`;
+}
+window.perbaruiPHMS = function(){
+  const st = gv('f-statusphms');
+  tampilkan('wrap-penyakitphms', st === 'Suspect' || st === 'Tertular');
+  const hint = document.getElementById('hint-phms');
+  if(hint) hint.textContent = st === 'Suspect'
+    ? `Pilih Suspect bila ada laporan kematian/kasus dari warga yang belum bisa dibuktikan saat kroscek (misalnya bangkai sudah dikubur). Status berlaku ${PHMS_JENDELA_HARI} hari sejak tanggal.`
+    : st === 'Tertular' ? 'Pilih Tertular bila kasus sudah terkonfirmasi (gejala klinis kuat atau hasil uji laboratorium).' : '';
+};
+function bacaPHMS(){
+  const status = gv('f-statusphms') || 'Tidak';
+  const penyakit = status === 'Tidak' ? '' : wajib('f-penyakitphms', 'Pilih penyakit PHMS yang dicurigai/terkonfirmasi');
+  return { statusPHMS: status, penyakitPHMS: penyakit };
+}
+
+// Simpan satu entri hewan (satu dokumen per spesies) untuk Pelayanan / Konsultasi
+async function simpanEntriHewan(data, hewan, label){
+  data.petugasNama = currentProfile?.nama || currentUser.email;
+  data.petugasRole = currentProfile?.role || 'Admin';
+  data.createdBy = currentUser.uid;
+  const entriId = idEntri(), batch = db.batch();
+  let idPertama = '';
+  hewan.forEach(h=>{
+    const ref = db.collection('pelayanan').doc();
+    if(!idPertama) idPertama = ref.id;
+    batch.set(ref, { ...data, entriId, jenisTernak:h.jenis, jumlahTernak:h.jantan+h.betina, jantan:h.jantan, betina:h.betina });
+  });
+  await batch.commit();
+  catatAudit('tambah', 'pelayanan', idPertama, `Menambahkan ${label} untuk ${data.namaPeternak||'-'} (${ringkasHewan(hewan)})`);
+}
+const rekamHewanPelayanan = (h)=> ({ jenisTernak:h.jenis, jumlahTernak:h.jantan+h.betina, jantan:h.jantan, betina:h.betina });
+
+/* ---------- PELAYANAN (Pengobatan, Bedah Minor) ---------- */
+function pelayananFormHtml(p={}, edit=false){
+  return `<div class="form-stack">
+    <div class="form-note">Kotak bertanda <span class="req">*</span> wajib diisi. Menu ini khusus Pengobatan dan Bedah Minor.</div>
+    <div class="field"><label>Tanggal Pelayanan <span class="req">*</span></label>
+      <input type="date" id="f-tglpelayanan" value="${tglInputValue(p.tanggal)}">
+    </div>
+    <div id="blok-pemilik" class="form-stack">
+      ${ownerFormHtml('', p)}
+      ${hewanBlokHtml('', p, false, edit)}
+    </div>
+    <div class="row2">
+      <div class="field"><label>Jenis Pelayanan <span class="req">*</span></label>
+        <select id="f-jenislayanan">${opsiSelectHtml(JENIS_PELAYANAN_FORM, p.jenisLayanan)}</select>
+      </div>
+      <div class="field"><label>Sistem Pelayanan</label>
+        <select id="f-sistem">${opsiSelectHtml(SISTEM_PELAYANAN, p.sistemPelayanan)}</select>
       </div>
     </div>
-
+    <div class="field"><label>Anamnesa <span class="req">*</span></label>
+      <textarea id="f-anamnesa" rows="2" placeholder="Wajib diisi — tulis keluhan/riwayat yang disampaikan pemilik">${escapeHtml(p.anamnesa)}</textarea>
+    </div>
+    <div class="field"><label>Diagnosa Penyakit <span class="req">*</span></label>
+      <textarea id="f-jenispenyakit" rows="2" placeholder="Wajib diisi — contoh: Scabies, Diare, Cacingan">${escapeHtml(p.jenisPenyakit)}</textarea>
+    </div>
+    <div class="field"><label>Obat yang Digunakan <span class="req">*</span></label>
+      <textarea id="f-terapi" rows="2" placeholder="Wajib diisi — contoh: Ivermectin, Antibiotik, Vitamin B Kompleks">${escapeHtml(p.terapi)}</textarea>
+    </div>
+    <div class="field"><label>Status Pelayanan</label>
+      <select id="f-status">${opsiSelectHtml(STATUS_PELAYANAN, p.status)}</select>
+    </div>
+    ${phmsBlokHtml(p)}
     ${petugasFieldHtml(p)}
     <div class="field"><label>Catatan</label>
       <textarea id="f-catatan" rows="2" placeholder="Catatan tambahan (opsional)">${escapeHtml(p.catatan)}</textarea>
     </div>
   </div>`;
 }
-// Tampilkan/sembunyikan isian sesuai jenis pelayanan
-window.perbaruiFieldPelayanan = function(){
-  const jenis = gv('f-jenislayanan');
-  const pemeriksaan = jenis === 'Pemeriksaan Kesehatan';
-  const konsultasi = jenis === 'Konsultasi';
-  tampilkan('blok-pemilik', !pemeriksaan);
-  tampilkan('wrap-sistem', !pemeriksaan);
-  tampilkan('blok-klinis', !pemeriksaan);
-  tampilkan('blok-kegiatan', pemeriksaan);
-  // Konsultasi: tanpa anamnesa/diagnosa/obat/status; diganti jenis & hasil konsultasi
-  ['wrap-anamnesa','wrap-diagnosa','wrap-terapi','wrap-status'].forEach(id=> tampilkan(id, !konsultasi));
-  ['wrap-jeniskonsultasi','wrap-hasilkonsultasi'].forEach(id=> tampilkan(id, konsultasi));
-  tampilkan('blok-phms', !pemeriksaan);
-  perbaruiPHMS();
-};
-window.perbaruiPHMS = function(){
-  const st = gv('f-statusphms');
-  tampilkan('wrap-penyakitphms', st === 'Suspect' || st === 'Tertular');
-  const hint = document.getElementById('hint-phms');
-  if(hint) hint.textContent = st === 'Suspect'
-    ? `Pilih Suspect bila ada laporan kematian/kasus dari warga yang belum bisa dibuktikan saat kroscek (misalnya bangkai sudah dikubur). Status berlaku ${PHMS_JENDELA_HARI} hari sejak tanggal pelayanan.`
-    : st === 'Tertular' ? 'Pilih Tertular bila kasus sudah terkonfirmasi (gejala klinis kuat atau hasil uji laboratorium).' : '';
-};
-
-// Kumpulkan & validasi isian form. Mengembalikan objek data, atau null kalau belum lengkap.
 async function kumpulDataPelayanan(){
   try{
     bersihkanError();
     const jenis = wajib('f-jenislayanan', 'Pilih jenis pelayanan');
     const tglStr = wajib('f-tglpelayanan', 'Isi tanggal pelayanan');
-    const base = { jenisLayanan: jenis, tanggal: new Date(tglStr), catatan: gv('f-catatan') };
-
-    if(jenis === 'Pemeriksaan Kesehatan'){
-      const d = { ...base, namaKegiatan: wajib('f-namakegiatan', 'Isi nama kegiatan'), kecamatanKegiatan: ambilKecamatanTerpilih(), linkLaporanPdf: gv('f-linkpdf') };
-      if(!d.kecamatanKegiatan) throw new Error('Centang minimal satu kecamatan');
-      if(!/^https?:\/\//i.test(d.linkLaporanPdf)) throw new FieldError('f-linkpdf', 'Isi link laporan PDF (diawali https://)');
-      return { data: d, hewan: null };
-    }
-
     const pemilik = bacaPemilik('');
     const hewan = bacaHewan('', false);
-    const d = { ...base, sistemPelayanan: gv('f-sistem') };
-
-    if(jenis === 'Konsultasi'){
-      d.jenisPenyakit = wajib('f-jeniskonsultasi', 'Pilih jenis konsultasi');
-      d.hasilKonsultasi = wajib('f-hasilkonsultasi', 'Isi hasil konsultasi');
-      d.anamnesa = ''; d.terapi = ''; d.status = 'Selesai';
-    }else{
-      d.anamnesa = wajib('f-anamnesa', 'Isi anamnesa/keluhan pemilik');
-      d.jenisPenyakit = wajib('f-jenispenyakit', 'Isi diagnosa penyakit');
-      d.terapi = wajib('f-terapi', 'Isi obat yang digunakan');
-      d.status = gv('f-status');
-      d.hasilKonsultasi = '';
-    }
-    d.statusPHMS = gv('f-statusphms') || 'Tidak';
-    d.penyakitPHMS = '';
-    if(d.statusPHMS !== 'Tidak') d.penyakitPHMS = wajib('f-penyakitphms', 'Pilih penyakit PHMS yang dicurigai/terkonfirmasi');
+    const d = {
+      jenisLayanan: jenis, tanggal: new Date(tglStr), catatan: gv('f-catatan'),
+      sistemPelayanan: gv('f-sistem'),
+      anamnesa: wajib('f-anamnesa', 'Isi anamnesa/keluhan pemilik'),
+      jenisPenyakit: wajib('f-jenispenyakit', 'Isi diagnosa penyakit'),
+      terapi: wajib('f-terapi', 'Isi obat yang digunakan'),
+      status: gv('f-status'), hasilKonsultasi: '',
+      ...bacaPHMS()
+    };
     return { data: { ...d, ...(await simpanPemilikJikaBaru(pemilik)) }, hewan };
-  }catch(err){
-    tandaiError(err);
-    return null;
-  }
+  }catch(err){ tandaiError(err); return null; }
 }
-const idEntri = ()=> Date.now().toString(36) + Math.random().toString(36).slice(2,6);
-const ringkasHewan = (hewan)=> hewan.map(h=>`${h.jenis} ${h.jantan}♂ ${h.betina}♀`).join(', ');
-
 document.getElementById('btn-add-pelayanan').addEventListener('click', ()=>{
   openModal('Catat Pelayanan', pelayananFormHtml(), async ()=>{
     const hasil = await kumpulDataPelayanan();
     if(!hasil) return;
-    const {data, hewan} = hasil;
-    data.petugasNama = currentProfile?.nama || currentUser.email;
-    data.petugasRole = currentProfile?.role || 'Admin';
-    data.createdBy = currentUser.uid;
-    if(!hewan){
-      const refBaru = await db.collection('pelayanan').add(data);
-      catatAudit('tambah', 'pelayanan', refBaru.id, `Menambahkan pelayanan "${data.jenisLayanan}" untuk ${data.namaKegiatan||'-'}`);
-    }else{
-      // satu dokumen per spesies (jantan+betina), supaya aturan semua laporan tetap sama
-      const entriId = idEntri(), batch = db.batch();
-      let idPertama = '';
-      hewan.forEach(h=>{
-        const ref = db.collection('pelayanan').doc();
-        if(!idPertama) idPertama = ref.id;
-        batch.set(ref, { ...data, entriId, jenisTernak:h.jenis, jumlahTernak:h.jantan+h.betina, jantan:h.jantan, betina:h.betina });
-      });
-      await batch.commit();
-      catatAudit('tambah', 'pelayanan', idPertama, `Menambahkan pelayanan "${data.jenisLayanan}" untuk ${data.namaPeternak||'-'} (${ringkasHewan(hewan)})`);
-    }
+    await simpanEntriHewan(hasil.data, hasil.hewan, `pelayanan "${hasil.data.jenisLayanan}"`);
     showToast('Data pelayanan tersimpan');
     closeModal();
   });
-  perbaruiFieldPelayanan();
-  perbaruiSaran('');
+  perbaruiPHMS(); perbaruiSaran('');
 });
 window.editPelayanan = function(id){
   const p = pelayananCache.find(x=>x.id===id);
   if(!p) return;
-  if(!(isAdminUser || bolehAksesStok || p.createdBy === currentUser.uid)){ showToast('Anda tidak berhak mengubah data ini', true); return; }
+  if(!bolehUbahPelayanan(p)){ showToast('Anda tidak berhak mengubah data ini', true); return; }
   openModal('Ubah Pelayanan', pelayananFormHtml(p, true), async ()=>{
     const hasil = await kumpulDataPelayanan();
     if(!hasil) return;
-    const {data, hewan} = hasil;
-    const h = hewan ? hewan[0] : null;
-    await db.collection('pelayanan').doc(id).update(h ? { ...data, jenisTernak:h.jenis, jumlahTernak:h.jantan+h.betina, jantan:h.jantan, betina:h.betina } : data);
-    catatAudit('ubah', 'pelayanan', id, `Mengubah pelayanan "${data.jenisLayanan}" untuk ${data.namaPeternak||data.namaKegiatan||'-'}`);
+    await db.collection('pelayanan').doc(id).update({ ...hasil.data, ...rekamHewanPelayanan(hasil.hewan[0]) });
+    catatAudit('ubah', 'pelayanan', id, `Mengubah pelayanan "${hasil.data.jenisLayanan}" untuk ${hasil.data.namaPeternak||'-'}`);
     showToast('Data pelayanan diperbarui');
     closeModal();
   });
-  perbaruiFieldPelayanan();
-  perbaruiSaran('');
+  perbaruiPHMS(); perbaruiSaran('');
 };
+// Hapus (dipakai Pelayanan, Konsultasi, dan Pemeriksaan Kesehatan)
 window.deletePelayanan = async function(id){
-  const p = pelayananCache.find(x=>x.id===id);
-  if(!(isAdminUser || bolehAksesStok || p?.createdBy === currentUser.uid)){ showToast('Anda tidak berhak menghapus data ini', true); return; }
-  if(!confirm('Hapus data pelayanan ini?')) return;
+  const p = pelayananSemua.find(x=>x.id===id);
+  if(!p || !bolehUbahPelayanan(p)){ showToast('Anda tidak berhak menghapus data ini', true); return; }
+  if(!confirm('Hapus data ini?')) return;
   try{
     await db.collection('pelayanan').doc(id).delete();
-    catatAudit('hapus', 'pelayanan', id, `Menghapus pelayanan "${p?.jenisLayanan||'-'}" untuk ${p?.namaPeternak||p?.namaKegiatan||'-'}`);
-    showToast('Data pelayanan dihapus');
+    catatAudit('hapus', 'pelayanan', id, `Menghapus ${p.jenisLayanan||'pelayanan'} untuk ${p.namaPeternak||p.namaKegiatan||'-'}`);
+    showToast('Data dihapus');
   }catch(err){
     showToast('Gagal menghapus: ' + err.message, true);
   }
 };
+
+/* ---------- KONSULTASI ---------- */
+function renderKonsultasiTable(list){
+  const tbody = document.getElementById('table-konsultasi');
+  if(!tbody) return;
+  if(list.length===0){ tbody.innerHTML = '<tr><td class="empty-row" colspan="7">Belum ada data konsultasi. Klik "+ Catat Konsultasi" untuk mulai.</td></tr>'; return; }
+  tbody.innerHTML = list.map(p=>`
+    <tr>
+      <td>${fmtDate(p.tanggal)}</td>
+      <td><b>${escapeHtml(p.jenisPenyakit)||'-'}</b>${tagPhmsCatatan(p)}</td>
+      <td>${selPemilikHtml(p)}</td>
+      <td>${hewanCatatanHtml(p)}</td>
+      <td>${p.hasilKonsultasi ? `${escapeHtml(p.hasilKonsultasi.slice(0,90))}${p.hasilKonsultasi.length>90?'…':''}` : '-'}</td>
+      <td>${escapeHtml(p.petugasNama)||'-'}<br>${roleBadge(p.petugasRole)}</td>
+      <td>${tombolAksiHtml(p, 'editKonsultasi')}</td>
+    </tr>`).join('');
+}
+document.getElementById('search-konsultasi')?.addEventListener('input', (e)=>{
+  const q = e.target.value.toLowerCase();
+  renderKonsultasiTable(konsultasiCache.filter(p => [p.jenisPenyakit, p.namaPeternak, p.desa, p.hasilKonsultasi].some(v=>(v||'').toLowerCase().includes(q))));
+});
+function konsultasiFormHtml(p={}, edit=false){
+  return `<div class="form-stack">
+    <div class="form-note">Kotak bertanda <span class="req">*</span> wajib diisi.</div>
+    <div class="field"><label>Tanggal Konsultasi <span class="req">*</span></label>
+      <input type="date" id="f-tglpelayanan" value="${tglInputValue(p.tanggal)}">
+    </div>
+    ${ownerFormHtml('', p)}
+    ${hewanBlokHtml('', p, false, edit)}
+    <div class="field"><label>Jenis Konsultasi <span class="req">*</span></label>
+      <select id="f-jeniskonsultasi">${opsiSelectHtml(JENIS_KONSULTASI, p.jenisPenyakit)}</select>
+    </div>
+    <div class="field"><label>Hasil Konsultasi <span class="req">*</span></label>
+      <textarea id="f-hasilkonsultasi" rows="3" placeholder="Wajib diisi — tulis hasil/saran konsultasi yang diberikan kepada pemilik">${escapeHtml(p.hasilKonsultasi)}</textarea>
+    </div>
+    ${phmsBlokHtml(p)}
+    ${petugasFieldHtml(p)}
+    <div class="field"><label>Catatan</label>
+      <textarea id="f-catatan" rows="2" placeholder="Catatan tambahan (opsional)">${escapeHtml(p.catatan)}</textarea>
+    </div>
+  </div>`;
+}
+async function kumpulDataKonsultasi(){
+  try{
+    bersihkanError();
+    const tglStr = wajib('f-tglpelayanan', 'Isi tanggal konsultasi');
+    const pemilik = bacaPemilik('');
+    const hewan = bacaHewan('', false);
+    const d = {
+      jenisLayanan: 'Konsultasi', tanggal: new Date(tglStr), catatan: gv('f-catatan'),
+      jenisPenyakit: wajib('f-jeniskonsultasi', 'Pilih jenis konsultasi'),   // jenis konsultasi disimpan di field ini (kompatibel data lama)
+      hasilKonsultasi: wajib('f-hasilkonsultasi', 'Isi hasil konsultasi'),
+      anamnesa: '', terapi: '', status: 'Selesai', sistemPelayanan: '',
+      ...bacaPHMS()
+    };
+    return { data: { ...d, ...(await simpanPemilikJikaBaru(pemilik)) }, hewan };
+  }catch(err){ tandaiError(err); return null; }
+}
+document.getElementById('btn-add-konsultasi')?.addEventListener('click', ()=>{
+  openModal('Catat Konsultasi', konsultasiFormHtml(), async ()=>{
+    const hasil = await kumpulDataKonsultasi();
+    if(!hasil) return;
+    await simpanEntriHewan(hasil.data, hasil.hewan, `konsultasi "${hasil.data.jenisPenyakit}"`);
+    showToast('Data konsultasi tersimpan');
+    closeModal();
+  });
+  perbaruiPHMS(); perbaruiSaran('');
+});
+window.editKonsultasi = function(id){
+  const p = konsultasiCache.find(x=>x.id===id);
+  if(!p) return;
+  if(!bolehUbahPelayanan(p)){ showToast('Anda tidak berhak mengubah data ini', true); return; }
+  openModal('Ubah Konsultasi', konsultasiFormHtml(p, true), async ()=>{
+    const hasil = await kumpulDataKonsultasi();
+    if(!hasil) return;
+    await db.collection('pelayanan').doc(id).update({ ...hasil.data, ...rekamHewanPelayanan(hasil.hewan[0]) });
+    catatAudit('ubah', 'pelayanan', id, `Mengubah konsultasi "${hasil.data.jenisPenyakit}" untuk ${hasil.data.namaPeternak||'-'}`);
+    showToast('Data konsultasi diperbarui');
+    closeModal();
+  });
+  perbaruiPHMS(); perbaruiSaran('');
+};
+
+/* ---------- PEMERIKSAAN KESEHATAN HEWAN ---------- */
+function renderPemeriksaanTable(list){
+  const tbody = document.getElementById('table-pemeriksaan');
+  if(!tbody) return;
+  if(list.length===0){ tbody.innerHTML = '<tr><td class="empty-row" colspan="6">Belum ada data pemeriksaan kesehatan hewan. Klik "+ Catat Pemeriksaan" untuk mulai.</td></tr>'; return; }
+  tbody.innerHTML = list.map(p=>{
+    const link = /^https?:\/\//i.test(p.linkLaporanPdf||'') ? escapeHtml(p.linkLaporanPdf) : '';
+    return `
+    <tr>
+      <td>${fmtDate(p.tanggal)}</td>
+      <td><b>${escapeHtml(p.namaKegiatan)||'-'}</b>${p.catatan ? `<br><span class="sub-text">${escapeHtml(p.catatan)}</span>` : ''}</td>
+      <td>${escapeHtml(p.kecamatanKegiatan)||'-'}</td>
+      <td>${link ? `<a href="${link}" target="_blank" rel="noopener" style="color:var(--accent-dark); font-weight:600;">📄 Lihat PDF</a>` : '-'}</td>
+      <td>${escapeHtml(p.petugasNama)||'-'}<br>${roleBadge(p.petugasRole)}</td>
+      <td>${tombolAksiHtml(p, 'editPemeriksaan')}</td>
+    </tr>`;
+  }).join('');
+}
+document.getElementById('search-pemeriksaan')?.addEventListener('input', (e)=>{
+  const q = e.target.value.toLowerCase();
+  renderPemeriksaanTable(pemeriksaanCache.filter(p => [p.namaKegiatan, p.kecamatanKegiatan, p.catatan].some(v=>(v||'').toLowerCase().includes(q))));
+});
+function pemeriksaanFormHtml(p={}){
+  const terpilih = (p.kecamatanKegiatan||'').split(',').map(x=>x.trim());
+  return `<div class="form-stack">
+    <div class="form-note">Kotak bertanda <span class="req">*</span> wajib diisi.</div>
+    <div class="field"><label>Tanggal <span class="req">*</span></label>
+      <input type="date" id="f-tglpelayanan" value="${tglInputValue(p.tanggal)}">
+    </div>
+    <div class="field"><label>Nama Kegiatan <span class="req">*</span></label>
+      <input id="f-namakegiatan" value="${escapeHtml(p.namaKegiatan)}" placeholder="Wajib diisi — contoh: Pemeriksaan Kesehatan Hewan Serentak">
+    </div>
+    <div class="field"><label>Kecamatan (bisa lebih dari satu) <span class="req">*</span></label>
+      <div class="chk-group">
+        ${KECAMATAN_DIIZINKAN.map(k=>`
+          <label><input type="checkbox" class="chk-kecamatan-kegiatan" value="${escapeHtml(k)}" ${terpilih.includes(k)?'checked':''}> ${escapeHtml(k)}</label>`).join('')}
+      </div>
+    </div>
+    <div class="field"><label>Link Laporan PDF (Google Drive) <span class="req">*</span></label>
+      <input id="f-linkpdf" value="${escapeHtml(p.linkLaporanPdf)}" placeholder="Wajib diisi — tempel link https://drive.google.com/...">
+    </div>
+    ${petugasFieldHtml(p)}
+    <div class="field"><label>Catatan</label>
+      <textarea id="f-catatan" rows="2" placeholder="Catatan tambahan (opsional)">${escapeHtml(p.catatan)}</textarea>
+    </div>
+  </div>`;
+}
+function kumpulDataPemeriksaan(){
+  try{
+    bersihkanError();
+    const tglStr = wajib('f-tglpelayanan', 'Isi tanggal kegiatan');
+    const d = { jenisLayanan: 'Pemeriksaan Kesehatan', tanggal: new Date(tglStr), catatan: gv('f-catatan'),
+      namaKegiatan: wajib('f-namakegiatan', 'Isi nama kegiatan'), kecamatanKegiatan: ambilKecamatanTerpilih(), linkLaporanPdf: gv('f-linkpdf') };
+    if(!d.kecamatanKegiatan) throw new Error('Centang minimal satu kecamatan');
+    if(!/^https?:\/\//i.test(d.linkLaporanPdf)) throw new FieldError('f-linkpdf', 'Isi link laporan PDF (diawali https://)');
+    return d;
+  }catch(err){ tandaiError(err); return null; }
+}
+document.getElementById('btn-add-pemeriksaan')?.addEventListener('click', ()=>{
+  openModal('Catat Pemeriksaan Kesehatan Hewan', pemeriksaanFormHtml(), async ()=>{
+    const data = kumpulDataPemeriksaan();
+    if(!data) return;
+    data.petugasNama = currentProfile?.nama || currentUser.email;
+    data.petugasRole = currentProfile?.role || 'Admin';
+    data.createdBy = currentUser.uid;
+    const ref = await db.collection('pelayanan').add(data);
+    catatAudit('tambah', 'pelayanan', ref.id, `Menambahkan pemeriksaan kesehatan hewan "${data.namaKegiatan}"`);
+    showToast('Data pemeriksaan tersimpan');
+    closeModal();
+  });
+});
+window.editPemeriksaan = function(id){
+  const p = pemeriksaanCache.find(x=>x.id===id);
+  if(!p) return;
+  if(!bolehUbahPelayanan(p)){ showToast('Anda tidak berhak mengubah data ini', true); return; }
+  openModal('Ubah Pemeriksaan Kesehatan Hewan', pemeriksaanFormHtml(p), async ()=>{
+    const data = kumpulDataPemeriksaan();
+    if(!data) return;
+    await db.collection('pelayanan').doc(id).update(data);
+    catatAudit('ubah', 'pelayanan', id, `Mengubah pemeriksaan kesehatan hewan "${data.namaKegiatan}"`);
+    showToast('Data pemeriksaan diperbarui');
+    closeModal();
+  });
+};
+
 function renderDashboardRecent(){
   const tbody = document.getElementById('dashboard-recent');
   const recent = pelayananCache.slice(0,6);
   if(recent.length===0){ tbody.innerHTML='<tr><td class="empty-row" colspan="4">Belum ada aktivitas</td></tr>'; return; }
   tbody.innerHTML = recent.map(p=>`
-    <tr><td>${fmtDate(p.tanggal)}</td><td>${escapeHtml(p.jenisLayanan)||'-'}</td><td>${escapeHtml(p.namaPeternak || p.namaKegiatan)||'-'}</td><td>${escapeHtml(p.petugasNama)||'-'}</td></tr>
+    <tr><td>${fmtDate(p.tanggal)}</td><td>${escapeHtml(p.jenisLayanan)||'-'}</td><td>${escapeHtml(p.namaPeternak)||'-'}</td><td>${escapeHtml(p.petugasNama)||'-'}</td></tr>
   `).join('');
 }
 
@@ -3527,7 +3692,7 @@ document.getElementById('btn-backup-data').addEventListener('click', ()=>{
     }));
     XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(ternakRows.length?ternakRows:[{Info:'Tidak ada data'}]), 'Data Ternak');
 
-    const pelayananRows = pelayananCache.map((p,i)=>({
+    const pelayananRows = pelayananSemua.map((p,i)=>({
       No: i+1, Tanggal: fmtDate(p.tanggal), 'Jenis Layanan': p.jenisLayanan||'-', Anamnesa: p.anamnesa||'-', Peternak: p.namaPeternak||'-',
       'Jenis Ternak': p.jenisTernak||'-', 'Jumlah Ternak': p.jumlahTernak||0, '♂ Jantan': p.jantan||0, '♀ Betina': p.betina||0, Petugas: p.petugasNama||'-', Catatan: p.catatan||''
     }));
@@ -3597,7 +3762,7 @@ document.getElementById('btn-perbaiki-kepemilikan').addEventListener('click', as
         }
       }
     }
-    await prosesKoleksi('pelayanan', pelayananCache);
+    await prosesKoleksi('pelayanan', pelayananSemua);
     await prosesKoleksi('vaksinasi', vaksinasiCache);
 
     for(const b of semuaBatch){ await b.commit(); }
