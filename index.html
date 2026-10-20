@@ -376,6 +376,12 @@
   /* Baris JUMLAH berlatar gelap: teks putih agar terbaca, dan latar ikut tercetak */
   tr[style*="--primary-dark"] td{color:#fff !important;}
   @media print{ tr[style*="--primary-dark"], tr[style*="--primary-dark"] td, tr[style*="--primary-light"], tr[style*="--primary-light"] td, thead th{-webkit-print-color-adjust:exact; print-color-adjust:exact;} }
+
+  .row3{display:grid; grid-template-columns:repeat(3,1fr); gap:14px;}
+  @media (max-width:560px){ .row3{grid-template-columns:1fr;} }
+
+  .tag-bebas{background:#E1F0E4; color:var(--success); border:1px solid var(--success);}
+  .tag-cukup{background:#FBF0D9; color:var(--accent-dark); border:1px solid var(--accent);}
 </style>
 </head>
 <body>
@@ -432,6 +438,8 @@
         <li class="nav-item" data-page="pelayanan"><span class="ic">💉</span> Pelayanan</li>
         <li class="nav-item" data-page="konsultasi"><span class="ic">💬</span> Konsultasi</li>
         <li class="nav-item" data-page="pemeriksaan"><span class="ic">🩺</span> Pemeriksaan Kesehatan Hewan</li>
+        <li class="nav-item" data-page="surveilans"><span class="ic">🔎</span> Surveilans Epidemiologi</li>
+        <li class="nav-item" data-page="biosecurity"><span class="ic">🧼</span> Biosecurity</li>
         <li class="nav-item" data-page="vaksinasi"><span class="ic">🦠</span> Vaksinasi</li>
         <li class="nav-item" id="nav-stokobat" data-page="stokobat"><span class="ic">💊</span> Stok Obat</li>
         <li class="nav-item" id="nav-stokalkeswan" data-page="stokalkeswan"><span class="ic">🧰</span> Stok Alkeswan</li>
@@ -563,14 +571,52 @@
             <div class="section-head">
               <h3>Pemeriksaan Kesehatan Hewan</h3>
               <div style="display:flex; gap:10px; flex-wrap:wrap;">
-                <div class="search-box"><span class="ic">🔍</span><input type="text" id="search-pemeriksaan" placeholder="Cari nama kegiatan, kecamatan..."></div>
+                <div class="search-box"><span class="ic">🔍</span><input type="text" id="search-pemeriksaan" placeholder="Cari pemilik, gampong, tujuan, hasil..."></div>
                 <button class="btn btn-accent btn-sm" id="btn-add-pemeriksaan">+ Catat Pemeriksaan</button>
               </div>
             </div>
             <div class="table-wrap">
               <table>
-                <thead><tr><th>Tanggal</th><th>Nama Kegiatan</th><th>Kecamatan</th><th>Laporan</th><th>Petugas</th><th></th></tr></thead>
-                <tbody id="table-pemeriksaan"><tr><td class="empty-row" colspan="6">Memuat data...</td></tr></tbody>
+                <thead><tr><th>Tanggal</th><th>Pemilik</th><th>Hewan</th><th>Suhu</th><th>Tujuan</th><th>Hasil</th><th>Dokter</th><th></th></tr></thead>
+                <tbody id="table-pemeriksaan"><tr><td class="empty-row" colspan="8">Memuat data...</td></tr></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- SURVEILANS -->
+        <div class="page" id="page-surveilans">
+          <div class="panel">
+            <div class="section-head">
+              <h3>Surveilans Epidemiologi</h3>
+              <div style="display:flex; gap:10px; flex-wrap:wrap;">
+                <div class="search-box"><span class="ic">🔍</span><input type="text" id="search-surveilans" placeholder="Cari gampong, penyakit, status..."></div>
+                <button class="btn btn-accent btn-sm" id="btn-add-surveilans">+ Catat Surveilans</button>
+              </div>
+            </div>
+            <div class="table-wrap">
+              <table>
+                <thead><tr><th>Tanggal</th><th>Lokasi</th><th>Jenis</th><th>Dugaan Penyakit</th><th>Hewan</th><th>Status Gampong PHMS</th><th>Petugas</th><th></th></tr></thead>
+                <tbody id="table-surveilans"><tr><td class="empty-row" colspan="8">Memuat data...</td></tr></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- BIOSECURITY -->
+        <div class="page" id="page-biosecurity">
+          <div class="panel">
+            <div class="section-head">
+              <h3>Biosecurity</h3>
+              <div style="display:flex; gap:10px; flex-wrap:wrap;">
+                <div class="search-box"><span class="ic">🔍</span><input type="text" id="search-biosecurity" placeholder="Cari gampong, kandang, komponen..."></div>
+                <button class="btn btn-accent btn-sm" id="btn-add-biosecurity">+ Catat Biosecurity</button>
+              </div>
+            </div>
+            <div class="table-wrap">
+              <table>
+                <thead><tr><th>Tanggal</th><th>Lokasi</th><th>Komponen Dinilai</th><th>Hasil Penilaian</th><th>Tindakan Pembinaan</th><th>Petugas</th><th></th></tr></thead>
+                <tbody id="table-biosecurity"><tr><td class="empty-row" colspan="7">Memuat data...</td></tr></tbody>
               </table>
             </div>
           </div>
@@ -665,6 +711,10 @@
                 <select id="laporan-jenis">
                   <option value="pelayanan">Pelayanan</option>
                   <option value="vaksinasi">Vaksinasi</option>
+                  <option value="konsultasi">Konsultasi</option>
+                  <option value="pemeriksaan">Pemeriksaan Kesehatan Hewan</option>
+                  <option value="surveilans">Surveilans Epidemiologi</option>
+                  <option value="biosecurity">Biosecurity</option>
                 </select>
               </div>
               <button class="btn btn-primary btn-sm" id="btn-generate-laporan">Tampilkan Laporan</button>
@@ -692,10 +742,10 @@
               <h3 style="text-align:center; margin:18px 0 4px; text-transform:uppercase;" id="laporan-judul">Laporan Bulanan Kegiatan Pelayanan</h3>
               <p style="text-align:center; margin:0 0 20px; font-size:13.5px;" id="laporan-subjudul">Periode: -</p>
 
-              <h4 style="margin:0 0 10px;">A. Rekapitulasi</h4>
+              <h4 style="margin:0 0 10px;" id="laporan-h-rekap">A. Rekapitulasi</h4>
               <div class="table-wrap" style="margin-bottom:22px;" id="laporan-rekap-wrap"></div>
 
-              <h4 style="margin:0 0 10px;">B. Rincian Kegiatan</h4>
+              <h4 style="margin:0 0 10px;" id="laporan-h-rincian">B. Rincian Kegiatan</h4>
               <div class="table-wrap">
                 <table>
                   <thead id="laporan-head"></thead>
@@ -1378,7 +1428,9 @@ const pageTitles = {
   dashboard:['Dashboard','Ringkasan kegiatan Puskeswan Wilayah II'],
   pelayanan:['Pelayanan','Pengobatan dan Bedah Minor: entri pemilik, hewan, dan pelayanan dalam satu formulir'],
   konsultasi:['Konsultasi','Catatan konsultasi kepada pemilik hewan'],
-  pemeriksaan:['Pemeriksaan Kesehatan Hewan','Catatan kegiatan pemeriksaan kesehatan hewan'],
+  pemeriksaan:['Pemeriksaan Kesehatan Hewan','Pemeriksaan kesehatan hewan untuk perdagangan, pengiriman, pemotongan dan kontes'],
+  surveilans:['Surveilans Epidemiologi','Pencatatan surveilans pasif dan aktif, dugaan penyakit, populasi berisiko dan status Gampong PHMS'],
+  biosecurity:['Biosecurity','Penilaian penerapan biosecurity pada kandang, peternakan dan lokasi pemeliharaan'],
   vaksinasi:['Vaksinasi','Entri pemilik, hewan, dan vaksinasi dalam satu formulir'],
   stokobat:['Stok Obat','Kelola stok obat (dengan tanggal kadaluarsa)'],
   stokalkeswan:['Stok Alkeswan','Kelola stok alat kesehatan hewan'],
@@ -1853,17 +1905,29 @@ function infoPHMS(p){
 function deteksiPHMS(){
   const batas = new Date(); batas.setHours(0,0,0,0);
   batas.setDate(batas.getDate() - (PHMS_JENDELA_HARI - 1));
-  const penyakit = {}; // nama -> {Tertular:{kasus,ekor}, Suspect:{kasus,ekor}, gampong:Set, terakhir}
+  const tgl = (p)=> p.tanggal?.toDate ? p.tanggal.toDate() : new Date(p.tanggal);
+  const kunci = (p)=>{ const o = ownerPrefill(p); const desa = gampongKanon(o.kecamatan, o.desa) || '(desa belum tercatat)'; return {o, desa, gKey: normTeks(o.kecamatan)+'|'+normTeks(desa)}; };
+  // pengamatan surveilans berstatus "Bebas" membatalkan status sebelumnya di Gampong yang sama
+  const bebas = {};
+  pelayananSemua.forEach(p=>{
+    if(p.jenisLayanan === 'Surveilans' && p.statusGampongPHMS === 'Bebas'){
+      const k = kunci(p).gKey, d = tgl(p);
+      if(!bebas[k] || d > bebas[k]) bebas[k] = d;
+    }
+  });
+  const penyakit = {}; // nama -> {Tertular:{ids,ekor}, Suspect:{ids,ekor}, gampong:Set, terakhir}
   const gampong = {};  // kunci -> {desa, kec, status, penyakit:Set, terakhir}
-  pelayananSemua.forEach(p=>{   // Pelayanan + Konsultasi
+  pelayananSemua.forEach(p=>{   // Pelayanan + Konsultasi + Surveilans
     if(p.jenisLayanan === 'Pemeriksaan Kesehatan') return;
-    const dt = p.tanggal?.toDate ? p.tanggal.toDate() : new Date(p.tanggal);
-    if(isNaN(dt) || dt < batas) return;
+    const dt = tgl(p);
+    if(isNaN(dt)) return;
+    const {o, desa, gKey} = kunci(p);
+    if(p.jenisLayanan === 'Surveilans'){
+      if(bebas[gKey] && dt <= bebas[gKey]) return;
+      if(dt < batas && p.statusGampongPHMS !== 'Tertular Wabah') return;   // Suspect 14 berlaku 14 hari; Tertular Wabah berlaku sampai ada status Bebas
+    }else if(dt < batas) return;
     const info = infoPHMS(p);
     if(!info) return;
-    const o = ownerPrefill(p);
-    const desa = gampongKanon(o.kecamatan, o.desa) || '(desa belum tercatat)';
-    const gKey = normTeks(o.kecamatan) + '|' + normTeks(desa);
     if(!gampong[gKey]) gampong[gKey] = {desa, kec:o.kecamatan, status:'Suspect', penyakit:new Set(), terakhir:dt};
     const g = gampong[gKey];
     if(info.status === 'Tertular') g.status = 'Tertular';
@@ -2000,12 +2064,17 @@ function initPelayananListener(){
   db.collection('pelayanan').orderBy('tanggal','desc').onSnapshot(snap=>{
     pelayananSemua = [];
     snap.forEach(d=> pelayananSemua.push({id:d.id, ...d.data()}));
-    pelayananCache = pelayananSemua.filter(p=> p.jenisLayanan !== 'Konsultasi' && p.jenisLayanan !== 'Pemeriksaan Kesehatan');
+    const jenisLain = ['Konsultasi','Pemeriksaan Kesehatan','Surveilans','Biosecurity'];
+    pelayananCache = pelayananSemua.filter(p=> !jenisLain.includes(p.jenisLayanan));
+    surveilansCache = pelayananSemua.filter(p=> p.jenisLayanan === 'Surveilans');
+    biosecurityCache = pelayananSemua.filter(p=> p.jenisLayanan === 'Biosecurity');
     konsultasiCache = pelayananSemua.filter(p=> p.jenisLayanan === 'Konsultasi');
     pemeriksaanCache = pelayananSemua.filter(p=> p.jenisLayanan === 'Pemeriksaan Kesehatan');
     renderPelayananTable(pelayananCache);
     renderKonsultasiTable(konsultasiCache);
     renderPemeriksaanTable(pemeriksaanCache);
+    renderSurveilansTable(surveilansCache);
+    renderBiosecurityTable(biosecurityCache);
     renderDashboardRecent();
     renderDashboard();
   }, err=> showToast('Gagal memuat data pelayanan: '+err.message, true));
@@ -2272,53 +2341,119 @@ window.editKonsultasi = function(id){
 };
 
 /* ---------- PEMERIKSAAN KESEHATAN HEWAN ---------- */
+// Format mengikuti form "Pemeriksaan Kesehatan Hewan": pemilik, hewan, suhu, tujuan, hasil, nomor dokumen, dokter.
+// Catatan lama (kegiatan + link PDF) tetap tampil dan bisa diubah dengan form lamanya.
+const TUJUAN_PEMERIKSAAN = ['Perdagangan','Pengiriman','Pemotongan','Kontes','Lainnya'];
+const HASIL_PEMERIKSAAN = ['Sehat','Sehat dengan catatan','Tidak memenuhi syarat'];
+
 function renderPemeriksaanTable(list){
   const tbody = document.getElementById('table-pemeriksaan');
   if(!tbody) return;
-  if(list.length===0){ tbody.innerHTML = '<tr><td class="empty-row" colspan="6">Belum ada data pemeriksaan kesehatan hewan. Klik "+ Catat Pemeriksaan" untuk mulai.</td></tr>'; return; }
+  if(list.length===0){ tbody.innerHTML = '<tr><td class="empty-row" colspan="8">Belum ada data pemeriksaan kesehatan hewan. Klik "+ Catat Pemeriksaan" untuk mulai.</td></tr>'; return; }
   tbody.innerHTML = list.map(p=>{
+    const lama = !!p.namaKegiatan;
     const link = /^https?:\/\//i.test(p.linkLaporanPdf||'') ? escapeHtml(p.linkLaporanPdf) : '';
+    const pemilik = lama ? `<b>${escapeHtml(p.namaKegiatan)}</b><br><span class="sub-text">${escapeHtml(p.kecamatanKegiatan||'')}</span>` : selPemilikHtml(p);
+    const hewan = lama
+      ? (link ? `<a href="${link}" target="_blank" rel="noopener" style="color:var(--accent-dark); font-weight:600;">📄 Lihat PDF</a>` : '-')
+      : `${escapeHtml(p.jenisTernak)||'-'} (${Number(p.jumlahTernak)||0} ekor)${p.identitasHewan ? `<br><span class="sub-text">${escapeHtml(p.identitasHewan)}</span>` : ''}`;
+    const suhu = (p.suhuTubuh !== undefined && p.suhuTubuh !== '' && p.suhuTubuh !== null) ? `${escapeHtml(p.suhuTubuh)} °C` : '-';
     return `
     <tr>
       <td>${fmtDate(p.tanggal)}</td>
-      <td><b>${escapeHtml(p.namaKegiatan)||'-'}</b>${p.catatan ? `<br><span class="sub-text">${escapeHtml(p.catatan)}</span>` : ''}</td>
-      <td>${escapeHtml(p.kecamatanKegiatan)||'-'}</td>
-      <td>${link ? `<a href="${link}" target="_blank" rel="noopener" style="color:var(--accent-dark); font-weight:600;">📄 Lihat PDF</a>` : '-'}</td>
-      <td>${escapeHtml(p.petugasNama)||'-'}<br>${roleBadge(p.petugasRole)}</td>
+      <td>${pemilik}</td>
+      <td>${hewan}</td>
+      <td>${suhu}</td>
+      <td>${escapeHtml(p.tujuanPemeriksaan)||'-'}</td>
+      <td>${p.hasilPemeriksaan ? `<b>${escapeHtml(p.hasilPemeriksaan)}</b>` : '-'}${p.nomorDokumen ? `<br><span class="sub-text">No. ${escapeHtml(p.nomorDokumen)}</span>` : ''}</td>
+      <td>${escapeHtml(p.dokterPemeriksa || p.petugasNama)||'-'}<br>${roleBadge(p.petugasRole)}</td>
       <td>${tombolAksiHtml(p, 'editPemeriksaan')}</td>
     </tr>`;
   }).join('');
 }
 document.getElementById('search-pemeriksaan')?.addEventListener('input', (e)=>{
   const q = e.target.value.toLowerCase();
-  renderPemeriksaanTable(pemeriksaanCache.filter(p => [p.namaKegiatan, p.kecamatanKegiatan, p.catatan].some(v=>(v||'').toLowerCase().includes(q))));
+  renderPemeriksaanTable(pemeriksaanCache.filter(p => [p.namaPeternak, p.desa, p.jenisTernak, p.tujuanPemeriksaan, p.hasilPemeriksaan, p.nomorDokumen, p.namaKegiatan].some(v=>(v||'').toLowerCase().includes(q))));
 });
 function pemeriksaanFormHtml(p={}){
-  const terpilih = (p.kecamatanKegiatan||'').split(',').map(x=>x.trim());
   return `<div class="form-stack">
     <div class="form-note">Kotak bertanda <span class="req">*</span> wajib diisi.</div>
-    <div class="field"><label>Tanggal <span class="req">*</span></label>
+    <div class="field"><label>Tanggal Pemeriksaan <span class="req">*</span></label>
       <input type="date" id="f-tglpelayanan" value="${tglInputValue(p.tanggal)}">
     </div>
-    <div class="field"><label>Nama Kegiatan <span class="req">*</span></label>
-      <input id="f-namakegiatan" value="${escapeHtml(p.namaKegiatan)}" placeholder="Wajib diisi — contoh: Pemeriksaan Kesehatan Hewan Serentak">
-    </div>
-    <div class="field"><label>Kecamatan (bisa lebih dari satu) <span class="req">*</span></label>
-      <div class="chk-group">
-        ${KECAMATAN_DIIZINKAN.map(k=>`
-          <label><input type="checkbox" class="chk-kecamatan-kegiatan" value="${escapeHtml(k)}" ${terpilih.includes(k)?'checked':''}> ${escapeHtml(k)}</label>`).join('')}
+    ${ownerFormHtml('', p)}
+    <div class="row2">
+      <div class="field"><label>Jenis Hewan <span class="req">*</span></label>
+        <select id="f-jenisP">${opsiSelectHtml(JENIS_HEWAN, p.jenisTernak)}</select>
+      </div>
+      <div class="field"><label>Jumlah Ekor <span class="req">*</span></label>
+        <input type="number" id="f-jumlahP" min="1" value="${escapeHtml(p.jumlahTernak)}" placeholder="Wajib diisi (min. 1)">
       </div>
     </div>
-    <div class="field"><label>Link Laporan PDF (Google Drive) <span class="req">*</span></label>
-      <input id="f-linkpdf" value="${escapeHtml(p.linkLaporanPdf)}" placeholder="Wajib diisi — tempel link https://drive.google.com/...">
+    <div class="field"><label>Identitas/Tag Hewan</label>
+      <input id="f-identitasP" value="${escapeHtml(p.identitasHewan)}" placeholder="Contoh: warna hitam, ekor lewat lutut / nomor ear tag">
     </div>
-    ${petugasFieldHtml(p)}
+    <div class="row2">
+      <div class="field"><label>Suhu Tubuh (°C)</label>
+        <input type="number" id="f-suhuP" step="0.1" min="30" max="45" value="${escapeHtml(p.suhuTubuh)}" placeholder="Contoh: 38.5">
+      </div>
+      <div class="field"><label>Tujuan Pemeriksaan <span class="req">*</span></label>
+        <select id="f-tujuanP">${opsiSelectHtml(TUJUAN_PEMERIKSAAN, p.tujuanPemeriksaan)}</select>
+      </div>
+    </div>
+    <div class="row2">
+      <div class="field"><label>Hasil Pemeriksaan <span class="req">*</span></label>
+        <select id="f-hasilP">${opsiSelectHtml(HASIL_PEMERIKSAAN, p.hasilPemeriksaan)}</select>
+      </div>
+      <div class="field"><label>Nomor Dokumen</label>
+        <input id="f-nodokP" value="${escapeHtml(p.nomorDokumen)}" placeholder="Nomor surat keterangan (jika ada)">
+      </div>
+    </div>
+    <div class="field"><label>Dokter Pemeriksa <span class="req">*</span></label>
+      <input id="f-dokterP" value="${escapeHtml(p.dokterPemeriksa || p.petugasNama || currentProfile?.nama || '')}" placeholder="Wajib diisi — nama dokter hewan pemeriksa">
+    </div>
     <div class="field"><label>Catatan</label>
       <textarea id="f-catatan" rows="2" placeholder="Catatan tambahan (opsional)">${escapeHtml(p.catatan)}</textarea>
     </div>
   </div>`;
 }
-function kumpulDataPemeriksaan(){
+async function kumpulDataPemeriksaan(){
+  try{
+    bersihkanError();
+    const tglStr = wajib('f-tglpelayanan', 'Isi tanggal pemeriksaan');
+    const pemilik = bacaPemilik('');
+    const jenisTernak = wajib('f-jenisP', 'Pilih jenis hewan');
+    const jumlah = Number(gv('f-jumlahP')) || 0;
+    if(jumlah < 1) throw new FieldError('f-jumlahP', 'Isi jumlah ekor (minimal 1)');
+    const suhuStr = gv('f-suhuP');
+    const d = {
+      jenisLayanan: 'Pemeriksaan Kesehatan', tanggal: new Date(tglStr),
+      jenisTernak, jumlahTernak: jumlah, identitasHewan: gv('f-identitasP'),
+      suhuTubuh: suhuStr === '' ? '' : Number(suhuStr),
+      tujuanPemeriksaan: wajib('f-tujuanP', 'Pilih tujuan pemeriksaan'),
+      hasilPemeriksaan: wajib('f-hasilP', 'Pilih hasil pemeriksaan'),
+      nomorDokumen: gv('f-nodokP'),
+      dokterPemeriksa: wajib('f-dokterP', 'Isi nama dokter pemeriksa'),
+      catatan: gv('f-catatan')
+    };
+    return { ...d, ...(await simpanPemilikJikaBaru(pemilik)) };
+  }catch(err){ tandaiError(err); return null; }
+}
+// Form lama (kegiatan + link PDF) - hanya untuk mengubah catatan lama
+function pemeriksaanKegiatanFormHtml(p={}){
+  const terpilih = (p.kecamatanKegiatan||'').split(',').map(x=>x.trim());
+  return `<div class="form-stack">
+    <div class="form-note">Catatan lama (kegiatan dengan lampiran PDF). Kotak bertanda <span class="req">*</span> wajib diisi.</div>
+    <div class="field"><label>Tanggal <span class="req">*</span></label><input type="date" id="f-tglpelayanan" value="${tglInputValue(p.tanggal)}"></div>
+    <div class="field"><label>Nama Kegiatan <span class="req">*</span></label><input id="f-namakegiatan" value="${escapeHtml(p.namaKegiatan)}" placeholder="Wajib diisi"></div>
+    <div class="field"><label>Kecamatan (bisa lebih dari satu) <span class="req">*</span></label>
+      <div class="chk-group">${KECAMATAN_DIIZINKAN.map(k=>`<label><input type="checkbox" class="chk-kecamatan-kegiatan" value="${escapeHtml(k)}" ${terpilih.includes(k)?'checked':''}> ${escapeHtml(k)}</label>`).join('')}</div>
+    </div>
+    <div class="field"><label>Link Laporan PDF (Google Drive) <span class="req">*</span></label><input id="f-linkpdf" value="${escapeHtml(p.linkLaporanPdf)}" placeholder="Wajib diisi — https://drive.google.com/..."></div>
+    <div class="field"><label>Catatan</label><textarea id="f-catatan" rows="2" placeholder="Catatan tambahan (opsional)">${escapeHtml(p.catatan)}</textarea></div>
+  </div>`;
+}
+function kumpulDataPemeriksaanKegiatan(){
   try{
     bersihkanError();
     const tglStr = wajib('f-tglpelayanan', 'Isi tanggal kegiatan');
@@ -2331,29 +2466,32 @@ function kumpulDataPemeriksaan(){
 }
 document.getElementById('btn-add-pemeriksaan')?.addEventListener('click', ()=>{
   openModal('Catat Pemeriksaan Kesehatan Hewan', pemeriksaanFormHtml(), async ()=>{
-    const data = kumpulDataPemeriksaan();
+    const data = await kumpulDataPemeriksaan();
     if(!data) return;
     data.petugasNama = currentProfile?.nama || currentUser.email;
     data.petugasRole = currentProfile?.role || 'Admin';
     data.createdBy = currentUser.uid;
     const ref = await db.collection('pelayanan').add(data);
-    catatAudit('tambah', 'pelayanan', ref.id, `Menambahkan pemeriksaan kesehatan hewan "${data.namaKegiatan}"`);
+    catatAudit('tambah', 'pelayanan', ref.id, `Menambahkan pemeriksaan kesehatan hewan untuk ${data.namaPeternak||'-'} (${data.jenisTernak} ${data.jumlahTernak} ekor, ${data.hasilPemeriksaan})`);
     showToast('Data pemeriksaan tersimpan');
     closeModal();
   });
+  perbaruiSaran('');
 });
 window.editPemeriksaan = function(id){
   const p = pemeriksaanCache.find(x=>x.id===id);
   if(!p) return;
   if(!bolehUbahPelayanan(p)){ showToast('Anda tidak berhak mengubah data ini', true); return; }
-  openModal('Ubah Pemeriksaan Kesehatan Hewan', pemeriksaanFormHtml(p), async ()=>{
-    const data = kumpulDataPemeriksaan();
+  const lama = !!p.namaKegiatan;
+  openModal('Ubah Pemeriksaan Kesehatan Hewan', lama ? pemeriksaanKegiatanFormHtml(p) : pemeriksaanFormHtml(p), async ()=>{
+    const data = lama ? kumpulDataPemeriksaanKegiatan() : await kumpulDataPemeriksaan();
     if(!data) return;
     await db.collection('pelayanan').doc(id).update(data);
-    catatAudit('ubah', 'pelayanan', id, `Mengubah pemeriksaan kesehatan hewan "${data.namaKegiatan}"`);
+    catatAudit('ubah', 'pelayanan', id, `Mengubah pemeriksaan kesehatan hewan ${data.namaPeternak||data.namaKegiatan||'-'}`);
     showToast('Data pemeriksaan diperbarui');
     closeModal();
   });
+  if(!lama) perbaruiSaran('');
 };
 
 function renderDashboardRecent(){
@@ -2363,6 +2501,411 @@ function renderDashboardRecent(){
   tbody.innerHTML = recent.map(p=>`
     <tr><td>${fmtDate(p.tanggal)}</td><td>${escapeHtml(p.jenisLayanan)||'-'}</td><td>${escapeHtml(p.namaPeternak)||'-'}</td><td>${escapeHtml(p.petugasNama)||'-'}</td></tr>
   `).join('');
+}
+
+/* =========================================================
+   8b. MODUL: SURVEILANS & BIOSECURITY
+   Tersimpan di koleksi "pelayanan" (jenisLayanan = 'Surveilans' / 'Biosecurity'), sehingga tidak
+   perlu mengubah aturan Firestore, dan tidak masuk laporan Pelayanan/PKH.
+========================================================= */
+let surveilansCache = [];
+let biosecurityCache = [];
+const JENIS_SURVEILANS = ['Pasif','Aktif'];
+const STATUS_GAMPONG_PHMS = ['Bebas','Suspect 14','Tertular Wabah'];
+const DUGAAN_PENYAKIT = ['PMK','SE','Rabies','LSD','Brucellosis','Anthrax','ND','AI','Fowl Cholera','Lainnya'];
+const KOMPONEN_BIOSECURITY = ['Kebersihan','Disinfeksi','Kontrol Lalu Lintas','Isolasi','Pakan dan Air','Pengelolaan Limbah'];
+const HASIL_PENILAIAN = ['Baik','Cukup','Perlu Perbaikan'];
+const angka = (id)=> Math.max(0, Math.floor(Number(gv(id)) || 0));
+
+// Samakan ejaan Gampong dengan yang sudah tersimpan (sama seperti form pemilik)
+function samakanGampong(kec, desa){
+  const ada = new Map();
+  peternakCache.forEach(p=>{ if(p.kecamatan === kec && p.desa) ada.set(normTeks(p.desa), gampongKanon(kec, p.desa)); });
+  pelayananSemua.forEach(p=>{ if(p.kecamatan === kec && p.desa) ada.set(normTeks(p.desa), gampongKanon(kec, p.desa)); });
+  const persis = ada.get(normTeks(desa));
+  if(persis) return persis;
+  const mirip = Array.from(ada.values()).find(g=> miripGampong(normTeks(g), normTeks(desa)));
+  if(mirip && confirm(`Gampong "${desa}" mirip dengan "${mirip}" yang sudah tersimpan di ${kec}.\n\nOK = pakai "${mirip}"\nBatal = tetap "${desa}" sebagai Gampong baru`)) return mirip;
+  return desa;
+}
+function lokasiBlokHtml(sfx, p={}){
+  return `<div class="row2">
+      <div class="field"><label>Kecamatan <span class="req">*</span></label>
+        <select id="f-kec${sfx}" onchange="perbaruiSaran('${sfx}')">${opsiSelectHtml(KECAMATAN_DIIZINKAN, p.kecamatan)}</select>
+      </div>
+      <div class="field"><label>Gampong/Desa <span class="req">*</span></label>
+        <input id="f-desa${sfx}" list="dl-gampong" autocomplete="off" value="${escapeHtml(p.desa)}" placeholder="Wajib diisi" oninput="perbaruiSaran('${sfx}')" onfocus="perbaruiSaran('${sfx}')">
+      </div>
+    </div>`;
+}
+function bacaLokasi(sfx){
+  const kecamatan = wajib('f-kec'+sfx, 'Pilih kecamatan terlebih dahulu');
+  const desa = samakanGampong(kecamatan, wajib('f-desa'+sfx, 'Isi nama Gampong/Desa'));
+  document.getElementById('f-desa'+sfx).value = desa;
+  return { kecamatan, desa };
+}
+const lokasiSubHtml = (p)=> `<b>${escapeHtml(gampongKanon(p.kecamatan, p.desa))||'-'}</b><br><span class="sub-text">${escapeHtml(p.kecamatan||'')}${p.lokasi ? ' · ' + escapeHtml(p.lokasi) : ''}</span>`;
+
+/* ---------- SURVEILANS EPIDEMIOLOGI ---------- */
+function namaPemilikBebasHtml(sfx, id, label, nilai, ph){
+  return `<div class="field"><label>${label}</label>
+      <input id="${id}" list="dl-pemilik" autocomplete="off" value="${escapeHtml(nilai)}" placeholder="${ph}" onfocus="perbaruiSaran('${sfx}')">
+    </div>`;
+}
+function renderSurveilansTable(list){
+  const tbody = document.getElementById('table-surveilans');
+  if(!tbody) return;
+  if(list.length===0){ tbody.innerHTML = '<tr><td class="empty-row" colspan="8">Belum ada data surveilans. Klik "+ Catat Surveilans" untuk mulai.</td></tr>'; return; }
+  tbody.innerHTML = list.map(p=>`
+    <tr>
+      <td>${fmtDate(p.tanggal)}</td>
+      <td>${lokasiSubHtml(p)}</td>
+      <td>${escapeHtml(p.jenisSurveilans)||'-'}</td>
+      <td><b>${escapeHtml(p.dugaanPenyakit)||'-'}</b></td>
+      <td>${escapeHtml(p.jenisTernak)||'-'}<br><span class="sub-text">berisiko ${Number(p.populasi)||0} · kasus ${Number(p.jumlahKasus)||0} · mati ${Number(p.jumlahMati)||0}</span></td>
+      <td>${p.statusGampongPHMS ? `<span class="tag ${p.statusGampongPHMS==='Bebas' ? 'tag-bebas' : (p.statusGampongPHMS==='Suspect 14' ? 'tag-suspect' : 'tag-tertular')}">${escapeHtml(p.statusGampongPHMS)}</span>` : '-'}</td>
+      <td>${escapeHtml(p.petugasNama)||'-'}<br>${roleBadge(p.petugasRole)}</td>
+      <td>${tombolAksiHtml(p, 'editSurveilans')}</td>
+    </tr>`).join('');
+}
+document.getElementById('search-surveilans')?.addEventListener('input', (e)=>{
+  const q = e.target.value.toLowerCase();
+  renderSurveilansTable(surveilansCache.filter(p => [p.desa, p.kecamatan, p.lokasi, p.dugaanPenyakit, p.jenisSurveilans, p.statusGampongPHMS, p.namaPeternak].some(v=>(v||'').toLowerCase().includes(q))));
+});
+function surveilansFormHtml(p={}){
+  return `<div class="form-stack">
+    <div class="form-note">Kotak bertanda <span class="req">*</span> wajib diisi.</div>
+    <div class="field"><label>Tanggal Pengamatan <span class="req">*</span></label>
+      <input type="date" id="f-tglS" value="${tglInputValue(p.tanggal)}">
+    </div>
+    <div class="field"><label>Jenis Surveilans <span class="req">*</span></label>
+      <select id="f-jenisS">${opsiSelectHtml(JENIS_SURVEILANS, p.jenisSurveilans)}</select>
+    </div>
+    ${lokasiBlokHtml('S', p)}
+    <div class="field"><label>Status Gampong PHMS <span class="req">*</span></label>
+      <select id="f-statusS">${opsiSelectHtml(STATUS_GAMPONG_PHMS, p.statusGampongPHMS)}</select>
+      <div class="hint">Suspect ${PHMS_JENDELA_HARI}: dugaan/laporan kasus yang belum terkonfirmasi (mis. bangkai sudah dikubur), berlaku ${PHMS_JENDELA_HARI} hari sejak tanggal pengamatan. Tertular Wabah: kasus terkonfirmasi, berlaku sampai ada pengamatan berikutnya di Gampong yang sama berstatus Bebas. Status tampil di Dashboard.</div>
+    </div>
+    <div class="field"><label>Lokasi Pengamatan</label>
+      <input id="f-lokasiS" value="${escapeHtml(p.lokasi)}" placeholder="Contoh: seluruh dusun / peternakan ...">
+    </div>
+    ${namaPemilikBebasHtml('S', 'f-namaS', 'Nama Pemilik/Responden', p.namaPeternak, 'Nama pemilik/responden')}
+    <div class="row2">
+      <div class="field"><label>Jenis Hewan <span class="req">*</span></label>
+        <select id="f-spesiesS">${opsiSelectHtml(JENIS_HEWAN, p.jenisTernak)}</select>
+      </div>
+      <div class="field"><label>Dugaan Penyakit <span class="req">*</span></label>
+        <select id="f-dugaanS">${opsiSelectHtml(DUGAAN_PENYAKIT, p.dugaanPenyakit)}</select>
+      </div>
+    </div>
+    <div class="row3">
+      <div class="field"><label>Populasi Berisiko</label><input type="number" id="f-populasiS" min="0" value="${escapeHtml(p.populasi)}" placeholder="0"></div>
+      <div class="field"><label>Jumlah Kasus</label><input type="number" id="f-kasusS" min="0" value="${escapeHtml(p.jumlahKasus)}" placeholder="0"></div>
+      <div class="field"><label>Jumlah Mati</label><input type="number" id="f-matiS" min="0" value="${escapeHtml(p.jumlahMati)}" placeholder="0"></div>
+    </div>
+    <div class="field"><label>Sampel/Spesimen</label>
+      <input id="f-sampelS" value="${escapeHtml(p.sampel)}" placeholder="Contoh: swab trakea, serum, tidak ada">
+    </div>
+    <div class="field"><label>Hasil/Tindak Lanjut</label>
+      <textarea id="f-tindakS" rows="3" placeholder="Contoh: desinfeksi kandang, pengawasan lalu lintas unggas">${escapeHtml(p.tindakLanjut)}</textarea>
+    </div>
+    ${petugasFieldHtml(p)}
+  </div>`;
+}
+function kumpulDataSurveilans(){
+  try{
+    bersihkanError();
+    const tglStr = wajib('f-tglS', 'Isi tanggal pengamatan');
+    const jenisSurveilans = wajib('f-jenisS', 'Pilih jenis surveilans (Pasif/Aktif)');
+    const lokasi = bacaLokasi('S');
+    const statusGampongPHMS = wajib('f-statusS', 'Pilih status Gampong PHMS');
+    const d = {
+      jenisLayanan: 'Surveilans', tanggal: new Date(tglStr), jenisSurveilans, ...lokasi, statusGampongPHMS,
+      lokasi: gv('f-lokasiS'), namaPeternak: gv('f-namaS'),
+      jenisTernak: wajib('f-spesiesS', 'Pilih jenis hewan'),
+      dugaanPenyakit: wajib('f-dugaanS', 'Pilih dugaan penyakit'),
+      populasi: angka('f-populasiS'), jumlahKasus: angka('f-kasusS'), jumlahMati: angka('f-matiS'),
+      sampel: gv('f-sampelS'), tindakLanjut: gv('f-tindakS')
+    };
+    d.jumlahTernak = d.jumlahKasus;
+    d.jenisPenyakit = d.dugaanPenyakit;
+    d.statusPHMS = statusGampongPHMS === 'Suspect 14' ? 'Suspect' : statusGampongPHMS === 'Tertular Wabah' ? 'Tertular' : 'Tidak';
+    d.penyakitPHMS = d.statusPHMS === 'Tidak' ? '' : (cocokPHMS(d.dugaanPenyakit)[0] || d.dugaanPenyakit);
+    return d;
+  }catch(err){ tandaiError(err); return null; }
+}
+document.getElementById('btn-add-surveilans')?.addEventListener('click', ()=>{
+  openModal('Catat Surveilans Epidemiologi', surveilansFormHtml(), async ()=>{
+    const d = kumpulDataSurveilans();
+    if(!d) return;
+    d.petugasNama = currentProfile?.nama || currentUser.email;
+    d.petugasRole = currentProfile?.role || 'Admin';
+    d.createdBy = currentUser.uid;
+    const ref = await db.collection('pelayanan').add(d);
+    catatAudit('tambah', 'pelayanan', ref.id, `Menambahkan surveilans ${d.jenisSurveilans} "${d.dugaanPenyakit}" di ${d.desa}, ${d.kecamatan} (${d.statusGampongPHMS})`);
+    showToast('Data surveilans tersimpan');
+    closeModal();
+  });
+  perbaruiSaran('S');
+});
+window.editSurveilans = function(id){
+  const p = surveilansCache.find(x=>x.id===id);
+  if(!p) return;
+  if(!bolehUbahPelayanan(p)){ showToast('Anda tidak berhak mengubah data ini', true); return; }
+  openModal('Ubah Surveilans Epidemiologi', surveilansFormHtml(p), async ()=>{
+    const d = kumpulDataSurveilans();
+    if(!d) return;
+    await db.collection('pelayanan').doc(id).update(d);
+    catatAudit('ubah', 'pelayanan', id, `Mengubah surveilans "${d.dugaanPenyakit}" di ${d.desa}, ${d.kecamatan} (${d.statusGampongPHMS})`);
+    showToast('Data surveilans diperbarui');
+    closeModal();
+  });
+  perbaruiSaran('S');
+};
+
+/* ---------- BIOSECURITY (penilaian penerapan biosecurity) ---------- */
+function renderBiosecurityTable(list){
+  const tbody = document.getElementById('table-biosecurity');
+  if(!tbody) return;
+  if(list.length===0){ tbody.innerHTML = '<tr><td class="empty-row" colspan="7">Belum ada data biosecurity. Klik "+ Catat Biosecurity" untuk mulai.</td></tr>'; return; }
+  tbody.innerHTML = list.map(p=>`
+    <tr>
+      <td>${fmtDate(p.tanggal)}</td>
+      <td>${lokasiSubHtml({kecamatan:p.kecamatan, desa:p.desa, lokasi:p.namaKandang})}${p.namaPeternak ? `<br><span class="sub-text">Pemilik: ${escapeHtml(p.namaPeternak)}</span>` : ''}</td>
+      <td><b>${escapeHtml(p.komponenDinilai)||'-'}</b></td>
+      <td>${p.hasilPenilaian ? `<span class="tag ${p.hasilPenilaian==='Baik' ? 'tag-bebas' : (p.hasilPenilaian==='Cukup' ? 'tag-cukup' : 'tag-tertular')}">${escapeHtml(p.hasilPenilaian)}</span>` : '-'}</td>
+      <td>${escapeHtml(p.tindakanPembinaan)||'-'}</td>
+      <td>${escapeHtml(p.petugasNama)||'-'}<br>${roleBadge(p.petugasRole)}</td>
+      <td>${tombolAksiHtml(p, 'editBiosecurity')}</td>
+    </tr>`).join('');
+}
+document.getElementById('search-biosecurity')?.addEventListener('input', (e)=>{
+  const q = e.target.value.toLowerCase();
+  renderBiosecurityTable(biosecurityCache.filter(p => [p.desa, p.kecamatan, p.namaKandang, p.namaPeternak, p.komponenDinilai, p.hasilPenilaian].some(v=>(v||'').toLowerCase().includes(q))));
+});
+function biosecurityFormHtml(p={}){
+  return `<div class="form-stack">
+    <div class="form-note">Kotak bertanda <span class="req">*</span> wajib diisi.</div>
+    <div class="field"><label>Tanggal Kunjungan <span class="req">*</span></label>
+      <input type="date" id="f-tglB" value="${tglInputValue(p.tanggal)}">
+    </div>
+    ${lokasiBlokHtml('B', p)}
+    <div class="field"><label>Nama Peternakan/Kandang</label>
+      <input id="f-kandangB" value="${escapeHtml(p.namaKandang)}" placeholder="Nama peternakan/kandang">
+    </div>
+    ${namaPemilikBebasHtml('B', 'f-pemilikB', 'Nama Pemilik <span class="req">*</span>', p.namaPeternak, 'Wajib diisi — ketik atau pilih nama')}
+    <div class="row2">
+      <div class="field"><label>Komponen Dinilai <span class="req">*</span></label>
+        <select id="f-komponenB">${opsiSelectHtml(KOMPONEN_BIOSECURITY, p.komponenDinilai)}</select>
+      </div>
+      <div class="field"><label>Hasil Penilaian <span class="req">*</span></label>
+        <select id="f-hasilB">${opsiSelectHtml(HASIL_PENILAIAN, p.hasilPenilaian)}</select>
+      </div>
+    </div>
+    <div class="field"><label>Tindakan Pembinaan</label>
+      <textarea id="f-tindakB" rows="3" placeholder="Contoh: harus melakukan perbaikan sistem pengelolaan kandang, menutup pagar kandang, desinfeksi rutin">${escapeHtml(p.tindakanPembinaan)}</textarea>
+    </div>
+    ${petugasFieldHtml(p)}
+    <div class="field"><label>Catatan</label>
+      <textarea id="f-catatan" rows="2" placeholder="Catatan tambahan (opsional)">${escapeHtml(p.catatan)}</textarea>
+    </div>
+  </div>`;
+}
+function kumpulDataBiosecurity(){
+  try{
+    bersihkanError();
+    const tglStr = wajib('f-tglB', 'Isi tanggal kunjungan');
+    const lokasi = bacaLokasi('B');
+    const d = {
+      jenisLayanan: 'Biosecurity', tanggal: new Date(tglStr), ...lokasi,
+      namaKandang: gv('f-kandangB'),
+      namaPeternak: wajib('f-pemilikB', 'Isi nama pemilik'),
+      komponenDinilai: wajib('f-komponenB', 'Pilih komponen yang dinilai'),
+      hasilPenilaian: wajib('f-hasilB', 'Pilih hasil penilaian'),
+      tindakanPembinaan: gv('f-tindakB'), catatan: gv('f-catatan')
+    };
+    return d;
+  }catch(err){ tandaiError(err); return null; }
+}
+document.getElementById('btn-add-biosecurity')?.addEventListener('click', ()=>{
+  openModal('Catat Biosecurity', biosecurityFormHtml(), async ()=>{
+    const d = kumpulDataBiosecurity();
+    if(!d) return;
+    d.petugasNama = currentProfile?.nama || currentUser.email;
+    d.petugasRole = currentProfile?.role || 'Admin';
+    d.createdBy = currentUser.uid;
+    const ref = await db.collection('pelayanan').add(d);
+    catatAudit('tambah', 'pelayanan', ref.id, `Menambahkan penilaian biosecurity "${d.komponenDinilai}" (${d.hasilPenilaian}) di ${d.desa}, ${d.kecamatan}`);
+    showToast('Data biosecurity tersimpan');
+    closeModal();
+  });
+  perbaruiSaran('B');
+});
+window.editBiosecurity = function(id){
+  const p = biosecurityCache.find(x=>x.id===id);
+  if(!p) return;
+  if(!bolehUbahPelayanan(p)){ showToast('Anda tidak berhak mengubah data ini', true); return; }
+  openModal('Ubah Biosecurity', biosecurityFormHtml(p), async ()=>{
+    const d = kumpulDataBiosecurity();
+    if(!d) return;
+    await db.collection('pelayanan').doc(id).update(d);
+    catatAudit('ubah', 'pelayanan', id, `Mengubah penilaian biosecurity "${d.komponenDinilai}" di ${d.desa}, ${d.kecamatan}`);
+    showToast('Data biosecurity diperbarui');
+    closeModal();
+  });
+  perbaruiSaran('B');
+};
+
+/* =========================================================
+   LAPORAN: Konsultasi, Pemeriksaan Kesehatan Hewan, Surveilans, Biosecurity
+   (pilihan tambahan pada "Jenis Data" di Laporan Layanan Keswan/Petugas)
+========================================================= */
+let laporanLainData = [];
+const tabelRekapHtml = (kepala, baris, total)=> `
+  <table>
+    <thead><tr>${kepala.map(h=>`<th>${h}</th>`).join('')}</tr></thead>
+    <tbody>
+      ${baris.length ? baris.map((r,i)=>`<tr><td>${i+1}</td>${r.map(c=>`<td>${escapeHtml(c)}</td>`).join('')}</tr>`).join('')
+        + `<tr style="font-weight:700; background:var(--primary-light);"><td colspan="2">${total[0]}</td>${total.slice(1).map(c=>`<td>${escapeHtml(c)}</td>`).join('')}</tr>`
+        : `<tr><td class="empty-row" colspan="${kepala.length}">Tidak ada data pada periode ini</td></tr>`}
+    </tbody>
+  </table>`;
+const alamatRec = (p)=> ({ kec: p.kecamatan || ownerPrefill(p).kecamatan || '-', desa: gampongKanon(p.kecamatan || ownerPrefill(p).kecamatan, p.desa || ownerPrefill(p).desa) || '-' });
+const jumlahkan = (arr, f)=> arr.reduce((a,x)=>a+(Number(f(x))||0), 0);
+
+const LAPORAN_LAIN = {
+  konsultasi: {
+    judul: 'Laporan Kegiatan Konsultasi UPTD Puskeswan Wilayah II',
+    sumber: ()=> konsultasiCache,
+    susun(data){
+      const rk = {};
+      data.forEach(p=>{ const k = p.jenisPenyakit || 'Lainnya'; const r = rk[k] || (rk[k] = {entri:new Set(), ekor:0}); r.entri.add(p.entriId || p.id); r.ekor += Number(p.jumlahTernak)||0; });
+      const baris = Object.entries(rk).sort((a,b)=>b[1].entri.size - a[1].entri.size).map(([k,r])=>[k, r.entri.size, r.ekor+' ekor']);
+      const totalEntri = new Set(data.map(p=>p.entriId || p.id)).size;
+      return {
+        rekap: tabelRekapHtml(['No','Jenis Konsultasi','Jumlah Konsultasi','Jumlah Hewan'], baris, ['JUMLAH', totalEntri, jumlahkan(data,p=>p.jumlahTernak)+' ekor']),
+        head: '<tr><th>No</th><th>Tanggal</th><th>Kecamatan</th><th>Gampong</th><th>Pemilik</th><th>Jenis Konsultasi</th><th>Hewan</th><th>Hasil Konsultasi</th><th>Petugas</th></tr>',
+        rows: data.map((p,i)=>{ const a = alamatRec(p); return `<tr><td>${i+1}</td><td>${fmtDate(p.tanggal)}</td><td>${escapeHtml(a.kec)}</td><td>${escapeHtml(a.desa)}</td><td>${escapeHtml(p.namaPeternak)||'-'}</td><td>${escapeHtml(p.jenisPenyakit)||'-'}</td><td>${escapeHtml((p.jenisTernak||'-')+' ('+fmtEkorSexDlmKurung(p)+')')}</td><td>${escapeHtml(p.hasilKonsultasi)||'-'}</td><td>${escapeHtml(p.petugasNama)||'-'}</td></tr>`; }),
+        excel: data.map((p,i)=>{ const a = alamatRec(p); return {No:i+1, Tanggal:fmtDate(p.tanggal), Kecamatan:a.kec, Gampong:a.desa, Pemilik:p.namaPeternak||'-', 'Jenis Konsultasi':p.jenisPenyakit||'-', 'Jenis Hewan':p.jenisTernak||'-', 'Jumlah Ekor':p.jumlahTernak||0, '♂ Jantan':p.jantan||0, '♀ Betina':p.betina||0, 'Hasil Konsultasi':p.hasilKonsultasi||'-', 'Status PHMS':p.statusPHMS&&p.statusPHMS!=='Tidak'?p.statusPHMS+' '+(p.penyakitPHMS||''):'-', Petugas:p.petugasNama||'-', Catatan:p.catatan||''}; })
+      };
+    }
+  },
+  pemeriksaan: {
+    judul: 'Laporan Pemeriksaan Kesehatan Hewan',
+    tanpaRekap: true,
+    sumber: ()=> pemeriksaanCache,
+    susun(data){
+      const kol = ['Tanggal Pemeriksaan','Kecamatan','Gampong/Desa','Nama Pemilik','Jenis Hewan','Identitas/Tag Hewan','Jumlah Ekor','Suhu Tubuh (°C)','Tujuan Pemeriksaan','Hasil Pemeriksaan','Nomor Dokumen','Dokter Pemeriksa','Catatan'];
+      const nilai = (p)=>{
+        const a = alamatRec(p), lama = !!p.namaKegiatan;
+        const link = /^https?:\/\//i.test(p.linkLaporanPdf||'') ? p.linkLaporanPdf : '';
+        return [fmtDate(p.tanggal), lama ? (p.kecamatanKegiatan||'-') : a.kec, lama ? '-' : a.desa, lama ? p.namaKegiatan : (p.namaPeternak||'-'),
+          lama ? '-' : (p.jenisTernak||'-'), p.identitasHewan||'-', lama ? '-' : (Number(p.jumlahTernak)||0),
+          (p.suhuTubuh===undefined||p.suhuTubuh===''||p.suhuTubuh===null) ? '-' : p.suhuTubuh,
+          p.tujuanPemeriksaan||'-', p.hasilPemeriksaan||'-', p.nomorDokumen||'-', p.dokterPemeriksa||p.petugasNama||'-',
+          [p.catatan, link].filter(Boolean).join(' ') || '-'];
+      };
+      return {
+        rekap: '',
+        head: `<tr>${kol.map(k=>`<th>${k}</th>`).join('')}</tr>`,
+        rows: data.map(p=>`<tr>${nilai(p).map(v=>`<td>${escapeHtml(v)}</td>`).join('')}</tr>`),
+        excel: data.map(p=>{ const v = nilai(p); const o = {}; kol.forEach((k,i)=>{ o[k] = v[i]; }); return o; })
+      };
+    }
+  },
+  surveilans: {
+    judul: 'Laporan Surveilans Epidemiologi',
+    tanpaRekap: true,
+    sumber: ()=> surveilansCache,
+    susun(data){
+      const kol = ['Tanggal Pengamatan','Jenis Surveilans','Kecamatan','Gampong/Desa','Status Gampong PHMS','Lokasi Pengamatan','Nama Pemilik/Responden','Jenis Hewan','Dugaan Penyakit','Populasi Berisiko','Jumlah Kasus','Jumlah Mati','Sampel Spesimen','Hasil/Tindak Lanjut','Petugas'];
+      const nilai = (p)=>{ const a = alamatRec(p);
+        return [fmtDate(p.tanggal), p.jenisSurveilans||'-', a.kec, a.desa, p.statusGampongPHMS||'-', p.lokasi||'-', p.namaPeternak||'-', p.jenisTernak||'-', p.dugaanPenyakit||'-',
+          Number(p.populasi)||0, Number(p.jumlahKasus)||0, Number(p.jumlahMati)||0, p.sampel||'-', p.tindakLanjut||'-', p.petugasNama||'-']; };
+      return {
+        rekap: '',
+        head: `<tr>${kol.map(k=>`<th>${k}</th>`).join('')}</tr>`,
+        rows: data.map(p=>`<tr>${nilai(p).map(v=>`<td>${escapeHtml(v)}</td>`).join('')}</tr>`),
+        excel: data.map(p=>{ const v = nilai(p); const o = {}; kol.forEach((k,i)=>{ o[k] = v[i]; }); return o; })
+      };
+    }
+  },
+  biosecurity: {
+    judul: 'Laporan Kegiatan Biosecurity',
+    tanpaRekap: true,
+    sumber: ()=> biosecurityCache,
+    susun(data){
+      const kol = ['Tanggal Kunjungan','Kecamatan','Gampong/Desa','Nama Peternakan/Kandang','Nama Pemilik','Komponen Dinilai','Hasil Penilaian','Tindakan Pembinaan','Petugas','Catatan'];
+      const nilai = (p)=>{ const a = alamatRec(p);
+        return [fmtDate(p.tanggal), a.kec, a.desa, p.namaKandang||'-', p.namaPeternak||'-', p.komponenDinilai||'-', p.hasilPenilaian||'-', p.tindakanPembinaan||'-', p.petugasNama||'-', p.catatan||'-']; };
+      return {
+        rekap: '',
+        head: `<tr>${kol.map(k=>`<th>${k}</th>`).join('')}</tr>`,
+        rows: data.map(p=>`<tr>${nilai(p).map(v=>`<td>${escapeHtml(v)}</td>`).join('')}</tr>`),
+        excel: data.map(p=>{ const v = nilai(p); const o = {}; kol.forEach((k,i)=>{ o[k] = v[i]; }); return o; })
+      };
+    }
+  }
+};
+
+// Dipanggil dari tombol "Tampilkan Laporan"; mengembalikan true bila jenis data ini ditangani di sini
+function tampilLaporanKegiatanLain(jenis, periode, bulan, tahun){
+  const cfg = LAPORAN_LAIN[jenis];
+  // Laporan yang formatnya satu tabel saja (tanpa rekapitulasi) menyembunyikan bagian A/B
+  const tampilRekap = !cfg || !cfg.tanpaRekap;
+  ['laporan-h-rekap','laporan-rekap-wrap','laporan-h-rincian'].forEach(id=>{ const e = document.getElementById(id); if(e) e.style.display = tampilRekap ? '' : 'none'; });
+  if(!cfg) return false;
+  let awal, akhir, judulPeriode;
+  if(periode === 'bulanan'){
+    awal = new Date(tahun, bulan, 1); akhir = new Date(tahun, bulan+1, 0, 23, 59, 59);
+    judulPeriode = `Bulan ${namaBulan[bulan]} Tahun ${tahun}`;
+  }else{
+    awal = new Date(tahun, 0, 1); akhir = new Date(tahun, 11, 31, 23, 59, 59);
+    judulPeriode = `Tahun ${tahun}`;
+  }
+  const data = cfg.sumber().filter(p=>{
+    const dt = p.tanggal?.toDate ? p.tanggal.toDate() : new Date(p.tanggal);
+    return dt >= awal && dt <= akhir;
+  }).sort((a,b)=>{
+    const da = a.tanggal?.toDate ? a.tanggal.toDate() : new Date(a.tanggal);
+    const dbb = b.tanggal?.toDate ? b.tanggal.toDate() : new Date(b.tanggal);
+    return da - dbb;
+  });
+  const h = cfg.susun(data);
+  laporanFilteredData = data;
+  laporanLainData = h.excel;
+  document.getElementById('laporan-judul').textContent = cfg.judul;
+  document.getElementById('laporan-subjudul').textContent = `Periode: ${judulPeriode}`;
+  document.getElementById('laporan-rekap-wrap').innerHTML = h.rekap;
+  document.getElementById('laporan-head').innerHTML = h.head;
+  const kolom = (h.head.match(/<th/g) || []).length;
+  const body = document.getElementById('laporan-body'), tail = document.getElementById('laporan-body-tail');
+  if(h.rows.length){
+    // 5 baris terakhir dilekatkan ke tanda tangan agar tanda tangan tidak sendirian di halaman baru
+    const JUMLAH_EKOR = 5;
+    const utama = h.rows.length > JUMLAH_EKOR ? h.rows.slice(0, h.rows.length - JUMLAH_EKOR) : [];
+    const ekor = h.rows.length > JUMLAH_EKOR ? h.rows.slice(h.rows.length - JUMLAH_EKOR) : h.rows;
+    body.innerHTML = utama.join(''); tail.innerHTML = ekor.join('');
+  }else{
+    body.innerHTML = `<tr><td class="empty-row" colspan="${kolom}">Tidak ada data pada periode ini</td></tr>`; tail.innerHTML = '';
+  }
+  document.getElementById('laporan-tempat-tanggal').textContent =
+    'Seuneubok Teungoh, ' + new Date().toLocaleDateString('id-ID', {day:'2-digit', month:'long', year:'numeric'});
+  document.getElementById('laporan-nama-kepala').textContent = namaKepalaUptd || '.........................................';
+  document.getElementById('laporan-nip-kepala').textContent = 'Pembina/NIP. ' + (nipKepalaUptd || '-');
+  document.getElementById('laporan-hasil').style.display = 'block';
+  showToast(`Menampilkan ${data.length} data`);
+  return true;
+}
+// Dipanggil dari tombol "Unduh Excel"; true bila jenis data ini ditangani di sini
+function eksporLaporanLain(){
+  if(!LAPORAN_LAIN[laporanJenisAktif]) return false;
+  if(!laporanLainData.length){ showToast('Tidak ada data untuk diunduh', true); return true; }
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(laporanLainData), 'Laporan');
+  XLSX.writeFile(wb, `Laporan_${laporanJenisAktif}_${document.getElementById('laporan-subjudul').textContent.replace('Periode: ','').replace(/\s+/g,'_')}.xlsx`);
+  showToast('File Excel berhasil diunduh');
+  return true;
 }
 
 /* =========================================================
@@ -2850,6 +3393,7 @@ document.getElementById('btn-generate-laporan').addEventListener('click', ()=>{
   const tahun = Number(document.getElementById('laporan-tahun').value);
   const jenis = document.getElementById('laporan-jenis').value;
   laporanJenisAktif = jenis;
+  if(tampilLaporanKegiatanLain(jenis, periode, bulan, tahun)) return;
 
   let startDate, endDate, judulPeriode;
   if(periode==='bulanan'){
@@ -3003,6 +3547,7 @@ document.getElementById('btn-generate-laporan').addEventListener('click', ()=>{
 document.getElementById('btn-cetak-laporan').addEventListener('click', ()=> cetakDengan('laporan'));
 
 document.getElementById('btn-excel-laporan').addEventListener('click', ()=>{
+  if(eksporLaporanLain()) return;
   if(!laporanFilteredData.length){ showToast('Tidak ada data untuk diunduh', true); return; }
   function cariAlamatPeternakExcel(nama, rec){ if(rec && (rec.kecamatan||rec.desa)) return {desa: gampongKanon(rec.kecamatan, rec.desa)||'-', kecamatan: rec.kecamatan||'-'}; const p = peternakCache.find(x => x.nama === nama); return p ? {desa: gampongKanon(p.kecamatan, p.desa)||'-', kecamatan: p.kecamatan||'-'} : {desa:'-', kecamatan:'-'};
   }
