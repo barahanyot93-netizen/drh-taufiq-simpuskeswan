@@ -382,6 +382,18 @@
 
   .tag-bebas{background:#E1F0E4; color:var(--success); border:1px solid var(--success);}
   .tag-cukup{background:#FBF0D9; color:var(--accent-dark); border:1px solid var(--accent);}
+
+  .dx-cepat{margin:-4px 0 14px; padding:12px 14px; border:1.5px dashed var(--border); border-radius:10px; background:#FBFAF6;}
+  .dx-judul{font-size:12.5px; font-weight:700; margin:2px 0 8px;}
+  .dx-judul.dx-merah{color:#B3261E;} .dx-judul.dx-hijau{color:#2E7D32; margin-top:12px;}
+  .dx-grup{display:flex; flex-wrap:wrap; gap:7px;}
+  .dx-chip{display:inline-flex; align-items:center; gap:7px; padding:6px 12px; border-radius:999px; border:1.5px solid var(--border); background:#fff; font:600 12.5px 'Inter',sans-serif; cursor:pointer; transition:background .12s, border-color .12s, color .12s;}
+  .dx-chip i{width:11px; height:11px; border-radius:50%; flex-shrink:0;}
+  .dx-chip.dx-phms{color:#B3261E;} .dx-chip.dx-phms i{background:#D32F2F;}
+  .dx-chip.dx-non{color:#2E7D32;} .dx-chip.dx-non i{background:#43A047;}
+  .dx-chip.dx-phms:hover{border-color:#D32F2F; background:#FDECEA;} .dx-chip.dx-non:hover{border-color:#43A047; background:#E8F5E9;}
+  .dx-chip.dx-phms.aktif{background:#D32F2F; color:#fff; border-color:#D32F2F;} .dx-chip.dx-phms.aktif i{background:#fff;}
+  .dx-chip.dx-non.aktif{background:#2E7D32; color:#fff; border-color:#2E7D32;} .dx-chip.dx-non.aktif i{background:#fff;}
 </style>
 </head>
 <body>
@@ -1835,7 +1847,8 @@ const PHMS_DAFTAR = [
   {nama:'LSD (Lumpy Skin Disease)', re:/\bLSD\b|lumpy|dermatitis\s*nodular|kulit\s*berbenjol/i},
   {nama:'SE (Septicaemia Epizootica/Ngorok)', re:/\bSE\b|septic(a)?emia|septikemia|ngorok/i},
   {nama:'Brucellosis', re:/brucell|keluron\s*menular/i},
-  {nama:'Anthrax (Antraks)', re:/anthrax|antraks/i},
+  {nama:'Anthrax (Antraks)', re:/anthrax|antraks|antrax/i},
+  {nama:'Surra (Trypanosomiasis)', re:/surra|trypanosom|tripanosom/i},
   {nama:'Rabies', re:/rabies|anjing\s*gila/i},
   {nama:'AI (Avian Influenza)', re:/\bAI\b|\bHPAI\b|avian|flu\s*burung|influenza\s*unggas/i},
   {nama:'ND (Newcastle Disease)', re:/\bND\b|newcastle|tetelo/i},
@@ -2163,6 +2176,47 @@ async function simpanEntriHewan(data, hewan, label){
 }
 const rekamHewanPelayanan = (h)=> ({ jenisTernak:h.jenis, jumlahTernak:h.jantan+h.betina, jantan:h.jantan, betina:h.betina });
 
+/* ---------- Pilihan cepat Diagnosa (form Pelayanan) ----------
+   Tambah/ubah daftar di dua baris berikut bila ada penyakit yang ingin dijadikan tombol baru. */
+const DIAGNOSA_PHMS_CEPAT = ['PMK / FMD','LSD','SE (Ngorok)','Rabies','Brucellosis','Anthrax','Surra','AI (Flu Burung)','Jembrana','ND (Tetelo)','ASF'];
+const DIAGNOSA_NONPHMS_CEPAT = ['Diare','Fever','Scabiosis','Avitaminosis / Defisiensi Mineral','Helminthiasis','Parasit Eksternal','Vulnus','Myiasis','Retensio Sekundina','Distokia'];
+function diagnosaCepatHtml(){
+  const chip = (t, kelas)=> `<button type="button" class="dx-chip ${kelas}" data-dx="${escapeHtml(t)}" onclick="pilihDiagnosa(this)"><i></i>${escapeHtml(t)}</button>`;
+  return `<div class="dx-cepat">
+    <div class="dx-judul dx-merah">🚨 Pilihan Cepat Penyakit PHMS (KODE MERAH / Wabah):</div>
+    <div class="dx-grup">${DIAGNOSA_PHMS_CEPAT.map(t=>chip(t,'dx-phms')).join('')}</div>
+    <div class="dx-judul dx-hijau">🟢 Pilihan Cepat Non-PHMS (Kasus Umum / Rutin):</div>
+    <div class="dx-grup">${DIAGNOSA_NONPHMS_CEPAT.map(t=>chip(t,'dx-non')).join('')}</div>
+    <div class="hint">Klik tombol untuk mengisi Diagnosa (klik lagi untuk membatalkan; boleh pilih lebih dari satu). Penyakit yang tidak ada di tombol, ketik langsung di kotak Diagnosa.</div>
+  </div>`;
+}
+window.pilihDiagnosa = function(btn){
+  const box = document.getElementById('f-jenispenyakit');
+  if(!box) return;
+  const label = btn.dataset.dx;
+  const daftar = box.value.split(/\s*[,;\n]\s*/).filter(Boolean);
+  const idx = daftar.findIndex(x=>x.toLowerCase() === label.toLowerCase());
+  if(idx >= 0) daftar.splice(idx, 1); else daftar.push(label);
+  box.value = daftar.join(', ');
+  box.classList.remove('input-error');
+  // sinkronkan Status Kasus PHMS: tombol merah otomatis menandai kasus PHMS (Tertular, bisa diganti Suspect)
+  const st = document.getElementById('f-statusphms');
+  const pen = document.getElementById('f-penyakitphms');
+  if(st && pen){
+    const cocok = cocokPHMS(box.value);
+    if(cocok.length){
+      if(st.value === 'Tidak') st.value = 'Tertular';
+      if(!cocok.includes(pen.value)) pen.value = cocok[0];
+    }else if(btn.classList.contains('dx-phms')){
+      st.value = 'Tidak';
+    }
+    perbaruiPHMS();
+  }
+  box.dispatchEvent(new Event('input'));
+  const isi = box.value.split(/\s*[,;\n]\s*/).map(x=>x.toLowerCase());
+  document.querySelectorAll('.dx-chip').forEach(c=> c.classList.toggle('aktif', isi.includes(c.dataset.dx.toLowerCase())));
+};
+
 /* ---------- PELAYANAN (Pengobatan, Bedah Minor) ---------- */
 function pelayananFormHtml(p={}, edit=false){
   return `<div class="form-stack">
@@ -2186,8 +2240,9 @@ function pelayananFormHtml(p={}, edit=false){
       <textarea id="f-anamnesa" rows="2" placeholder="Wajib diisi — tulis keluhan/riwayat yang disampaikan pemilik">${escapeHtml(p.anamnesa)}</textarea>
     </div>
     <div class="field"><label>Diagnosa Penyakit <span class="req">*</span></label>
-      <textarea id="f-jenispenyakit" rows="2" placeholder="Wajib diisi — contoh: Scabies, Diare, Cacingan">${escapeHtml(p.jenisPenyakit)}</textarea>
+      <textarea id="f-jenispenyakit" rows="2" placeholder="Wajib diisi — pilih tombol di bawah atau ketik sendiri">${escapeHtml(p.jenisPenyakit)}</textarea>
     </div>
+    ${diagnosaCepatHtml()}
     <div class="field"><label>Obat yang Digunakan <span class="req">*</span></label>
       <textarea id="f-terapi" rows="2" placeholder="Wajib diisi — contoh: Ivermectin, Antibiotik, Vitamin B Kompleks">${escapeHtml(p.terapi)}</textarea>
     </div>
@@ -3659,10 +3714,19 @@ document.getElementById('btn-generate-petugaslaporan').addEventListener('click',
     const jumlahKolom = fmtEkorSex(p);
     return `<tr><td>${i+1}</td><td>${fmtDate(p.tanggal)}</td><td>${escapeHtml(p.jenisLayanan)||'-'}</td><td>${escapeHtml(p.anamnesa)||'-'}</td><td>${escapeHtml(p.jenisPenyakit)||'-'}</td><td>${escapeHtml(p.terapi)||'-'}</td><td>${escapeHtml(p.namaPeternak)||'-'}</td><td>${escapeHtml(alamat.desa)}</td><td>${escapeHtml(alamat.kecamatan)}</td><td>${escapeHtml(ternakKolom)}</td><td>${escapeHtml(jumlahKolom)}</td></tr>`;
   });
+  const styleTotal = 'font-weight:800; background:var(--primary-dark); color:#fff;';
+  function teksTotalEkor(list){
+    const total = list.reduce((a,r)=>a+(Number(r.jumlahTernak)||0),0);
+    const j = list.reduce((a,r)=>a+(Number(r.jantan)||0),0), bt = list.reduce((a,r)=>a+(Number(r.betina)||0),0);
+    return `${total} ekor` + ((j+bt) === total && total > 0 ? ` (${j}♂ ${bt}♀)` : '');
+  }
+  if(barisPelayanan.length) barisPelayanan.push(`<tr style="${styleTotal}"><td colspan="10">JUMLAH TOTAL HEWAN YANG DILAYANI (semua jenis hewan)</td><td>${teksTotalEkor(dataPelayanan)}</td></tr>`);
   const barisVaksinasi = dataVaksinasi.map((v,i)=>{
     const alamat = cariAlamatPeternakPetugas(v.namaPeternak, v);
     return `<tr><td>${i+1}</td><td>${fmtDate(v.tanggal)}</td><td>${escapeHtml(alamat.kecamatan)}</td><td>${escapeHtml(alamat.desa)}</td><td>${escapeHtml(v.jenisVaksin)||'-'}</td><td>${escapeHtml(v.jenisHewan)||'-'}</td><td>${escapeHtml(v.namaPeternak)||'-'}</td><td>${escapeHtml(fmtEkorSex(v))}</td></tr>`;
   });
+
+  if(barisVaksinasi.length) barisVaksinasi.push(`<tr style="${styleTotal}"><td colspan="7">JUMLAH TOTAL HEWAN DIVAKSIN (semua jenis hewan)</td><td>${teksTotalEkor(dataVaksinasi)}</td></tr>`);
 
   const bodyPelayanan = document.getElementById('petugaslaporan-body-pelayanan');
   const bodyPelayananTail = document.getElementById('petugaslaporan-body-pelayanan-tail');
