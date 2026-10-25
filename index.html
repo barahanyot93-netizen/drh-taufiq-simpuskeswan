@@ -1184,33 +1184,12 @@ const db = firebase.firestore();
 /* =========================================================
    2. HELPER UMUM
 ========================================================= */
-function showToast(msg, isErr = false) {
-    let container = document.getElementById('toast-container');
-    if (!container) {
-        container = document.createElement('div');
-        container.id = 'toast-container';
-        container.style.cssText = "position:fixed; bottom:20px; right:20px; z-index:99999; display:flex; flex-direction:column; gap:8px; pointer-events:none;";
-        document.body.appendChild(container);
-    }
-    
-    let box = document.createElement('div');
-    box.innerText = msg;
-    box.style.cssText = `pointer-events:auto; color:white; padding:12px 20px; border-radius:8px; font-size:14px; font-weight:500; box-shadow:0 10px 25px rgba(0,0,0,0.3); background-color:${isErr ? '#EF4444' : '#10B981'}; transition:all 0.3s ease; opacity:0; transform:translateY(10px);`;
-    
-    container.appendChild(box);
-    
-    // Picu animasi muncul
-    setTimeout(() => {
-        box.style.opacity = '1';
-        box.style.transform = 'translateY(0)';
-    }, 10);
-    
-    // Hilang otomatis setelah 3 detik
-    setTimeout(() => {
-        box.style.opacity = '0';
-        box.style.transform = 'translateY(10px)';
-        setTimeout(() => box.remove(), 300);
-    }, 3000);
+function showToast(msg, isErr=false){
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.toggle('err', isErr);
+  t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'), 2600);
 }
 function fmtDate(d){
   if(!d) return '-';
@@ -1234,30 +1213,21 @@ function escapeHtml(val){
 // diubah/dihapus siapa pun lewat aplikasi (lihat firestore.rules) - khusus
 // Admin yang bisa membacanya di menu Log Aktivitas.
 async function catatAudit(aksi, koleksi, docId, ringkasan){
-    try{
-        await db.collection('audit_log').add({
-            waktu: firebase.firestore.FieldValue.serverTimestamp(),
-            uid: currentUser?.uid || '-',
-            nama: currentProfile?.nama || currentUser?.email || '-',
-            email: currentUser?.email || '-',
-            aksi, // 'tambah' | 'ubah' | 'hapus'
-            koleksi,
-            docId: docId || '-',
-            ringkasan: ringkasan || '-'
-        });
-
-        // Notifikasi Toast otomatis untuk seluruh menu entri data
-        let pesanToast = "Aksi berhasil disimpan!";
-        if(aksi === 'tambah') pesanToast = "Data baru berhasil ditambahkan!";
-        else if(aksi === 'ubah') pesanToast = "Data berhasil diperbarui!";
-        else if(aksi === 'hapus') pesanToast = "Data berhasil dihapus!";
-        
-        showToast(pesanToast, "success");
-
-    }catch(err){
-        // Jangan sampai gagal mencatat log menggagalkan aksi utama
-        console.warn('Gagal mencatat audit log:', err.message);
-    }
+  try{
+    await db.collection('audit_log').add({
+      waktu: firebase.firestore.FieldValue.serverTimestamp(),
+      uid: currentUser?.uid || '-',
+      nama: currentProfile?.nama || currentUser?.email || '-',
+      email: currentUser?.email || '-',
+      aksi, // 'tambah' | 'ubah' | 'hapus'
+      koleksi,
+      docId: docId || '-',
+      ringkasan: ringkasan || '-'
+    });
+  }catch(err){
+    // Jangan sampai gagal mencatat log menggagalkan aksi utama pengguna
+    console.warn('Gagal mencatat audit log:', err.message);
+  }
 }
 function roleBadge(role){
   if(role === 'Medik Veteriner') return `<span class="badge badge-vet">Dokter Hewan</span>`;
@@ -1526,40 +1496,23 @@ function openModal(title, fieldsHtml, onSave){
 }
 function closeModal(){ modalBackdrop.classList.remove('show'); }
 document.getElementById('modal-cancel').addEventListener('click', closeModal);
-document.getElementById('modal-save').addEventListener('click', async function() {
-    if(modalOnSave){
-        const btn = document.getElementById('modal-save');
-        const originalText = btn.textContent;
-        btn.textContent = 'Menyimpan...';
-        btn.disabled = true;
-        try{
-            await modalOnSave();
-            showToast('Data berhasil disimpan!');
-        }catch(err){
-            showToast('Gagal menyimpan: ' + err.message, true);
-        }finally{
-            btn.textContent = originalText;
-            btn.disabled = false;
-        }
+document.getElementById('modal-save').addEventListener('click', async ()=>{
+  if(modalOnSave){
+    const btn = document.getElementById('modal-save');
+    const originalText = btn.textContent;
+    btn.textContent = 'Menyimpan...';
+    btn.disabled = true;
+    try{
+      await modalOnSave();
+    }catch(err){
+      showToast('Gagal menyimpan: ' + err.message, true);
+    }finally{
+      btn.textContent = originalText;
+      btn.disabled = false;
     }
+  }
 });
-      // ==========================================
-// 2. HELPER UMUM
-// ==========================================
 
-function showToast(msg, isErr=false){
-    const t = document.getElementById('toast');
-    if (!t) return;
-    t.textContent = msg;
-    t.classList.toggle('err', isErr);
-    t.classList.add('show');
-    setTimeout(() => t.classList.remove('show'), 2600);
-}
-
-function fmtDate(d){
-    if(!d) return '-';
-    // ... sisa kode helper lainnya ...
-}
 /* =========================================================
    6. DATA PEMILIK & HEWAN (otomatis dari form Pelayanan/Vaksinasi)
    Menu Data Pemilik / Data Hewan sudah digabung ke dalam form entri.
@@ -4636,75 +4589,6 @@ function initAllListeners(){
   muatPopulasi();
   isiDropdownPetugasLaporan();
 }
-// Fungsi Toast Visual
-function showToast(message, type = 'success') {
-    const container = document.getElementById('toast-container');
-    const toast = document.createElement('div');
-    
-    let bgColor = 'bg-emerald-600';
-    let iconSymbol = 'OK';
-    
-    if (type === 'error') {
-        bgColor = 'bg-red-600';
-        iconSymbol = '✕';
-    } else if (type === 'info') {
-        bgColor = 'bg-blue-600';
-        iconSymbol = 'ℹ';
-    }
-
-    toast.className = `${bgColor} text-white px-4 py-3 rounded-lg shadow-xl flex items-center gap-3 transition-all duration-300 transform translate-y-2 opacity-0 pointer-events-auto text-sm font-medium`;
-    toast.innerHTML = `
-        <span class="flex items-center justify-center w-5 h-5 bg-white/20 rounded-full text-xs font-bold">${iconSymbol}</span>
-        <span>${message}</span>
-    `;
-    
-    container.appendChild(toast);
-    
-    setTimeout(() => {
-        toast.classList.remove('translate-y-2', 'opacity-0');
-    }, 10);
-    
-    setTimeout(() => {
-        toast.classList.add('translate-y-2', 'opacity-0');
-        setTimeout(() => toast.remove(), 300);
-    }, 3500);
-}
-
-// Fungsi Browser Desktop Notification
-function initDesktopNotifications() {
-    if (!("Notification" in window)) return;
-    if (Notification.permission === "default") {
-        Notification.requestPermission().then(permission => {
-            if (permission === "granted") {
-                showToast("Notifikasi desktop berhasil diaktifkan!", "success");
-            }
-        });
-    }
-}
-
-function sendDesktopNotification(title, bodyText) {
-    if (!("Notification" in window)) return;
-
-    if (Notification.permission === "granted") {
-        try {
-            new Notification(title, {
-                body: bodyText,
-                icon: "/assets/img/icon-puskeswan.png",
-                tag: "simpuskeswan-reminder"
-            });
-        } catch (e) {
-            console.error("Gagal menampilkan notifikasi:", e);
-        }
-    } else if (Notification.permission !== "denied") {
-        Notification.requestPermission().then(permission => {
-            if (permission === "granted") {
-                new Notification(title, { body: bodyText });
-            }
-        });
-    }
-}
 </script>
-<!-- Penampung Toast Notification -->
-<div id="toast" class="toast-element"></div>
 </body>
 </html>
