@@ -1534,7 +1534,7 @@ document.getElementById('modal-save').addEventListener('click', async ()=>{
     btn.disabled = true;
     try{
     await modalOnSave();
-    showToast('Data berhasil disimpan!'); // <-- Tambahkan notifikasi sukses di sini
+    showToast('Data berhasil disimpan!');
 }catch(err){
     showToast('Gagal menyimpan: ' + err.message, true); 
 }finally{
@@ -4703,6 +4703,6 @@ function sendDesktopNotification(title, bodyText) {
 }
 </script>
 <!-- Penampung Toast Notification -->
-<div id="toast-container" class="fixed bottom-5 right-5 z-50 flex flex-col gap-2 pointer-events-none"></div>
+<div id="toast" class="toast-element"></div>
 </body>
 </html>
