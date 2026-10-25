@@ -1526,21 +1526,23 @@ function openModal(title, fieldsHtml, onSave){
 }
 function closeModal(){ modalBackdrop.classList.remove('show'); }
 document.getElementById('modal-cancel').addEventListener('click', closeModal);
-document.getElementById('modal-save').addEventListener('click', async ()=>{
-  if(modalOnSave){
-    const btn = document.getElementById('modal-save');
-    const originalText = btn.textContent;
-    btn.textContent = 'Menyimpan...';
-    btn.disabled = true;
-    try{
-    await modalOnSave();
-    showToast('Data berhasil disimpan!');
-}catch(err){
-    showToast('Gagal menyimpan: ' + err.message, true); 
-}finally{
-    btn.textContent = originalText;
-    btn.disabled = false;
-}
+document.getElementById('modal-save').addEventListener('click', async function() {
+    if(modalOnSave){
+        const btn = document.getElementById('modal-save');
+        const originalText = btn.textContent;
+        btn.textContent = 'Menyimpan...';
+        btn.disabled = true;
+        try{
+            await modalOnSave();
+            showToast('Data berhasil disimpan!');
+        }catch(err){
+            showToast('Gagal menyimpan: ' + err.message, true);
+        }finally{
+            btn.textContent = originalText;
+            btn.disabled = false;
+        }
+    }
+});
       // ==========================================
 // 2. HELPER UMUM
 // ==========================================
