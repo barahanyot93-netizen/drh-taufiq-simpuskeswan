@@ -4589,6 +4589,75 @@ function initAllListeners(){
   muatPopulasi();
   isiDropdownPetugasLaporan();
 }
+// Fungsi Toast Visual
+function showToast(message, type = 'success') {
+    const container = document.getElementById('toast-container');
+    const toast = document.createElement('div');
+    
+    let bgColor = 'bg-emerald-600';
+    let iconSymbol = 'OK';
+    
+    if (type === 'error') {
+        bgColor = 'bg-red-600';
+        iconSymbol = '✕';
+    } else if (type === 'info') {
+        bgColor = 'bg-blue-600';
+        iconSymbol = 'ℹ';
+    }
+
+    toast.className = `${bgColor} text-white px-4 py-3 rounded-lg shadow-xl flex items-center gap-3 transition-all duration-300 transform translate-y-2 opacity-0 pointer-events-auto text-sm font-medium`;
+    toast.innerHTML = `
+        <span class="flex items-center justify-center w-5 h-5 bg-white/20 rounded-full text-xs font-bold">${iconSymbol}</span>
+        <span>${message}</span>
+    `;
+    
+    container.appendChild(toast);
+    
+    setTimeout(() => {
+        toast.classList.remove('translate-y-2', 'opacity-0');
+    }, 10);
+    
+    setTimeout(() => {
+        toast.classList.add('translate-y-2', 'opacity-0');
+        setTimeout(() => toast.remove(), 300);
+    }, 3500);
+}
+
+// Fungsi Browser Desktop Notification
+function initDesktopNotifications() {
+    if (!("Notification" in window)) return;
+    if (Notification.permission === "default") {
+        Notification.requestPermission().then(permission => {
+            if (permission === "granted") {
+                showToast("Notifikasi desktop berhasil diaktifkan!", "success");
+            }
+        });
+    }
+}
+
+function sendDesktopNotification(title, bodyText) {
+    if (!("Notification" in window)) return;
+
+    if (Notification.permission === "granted") {
+        try {
+            new Notification(title, {
+                body: bodyText,
+                icon: "/assets/img/icon-puskeswan.png",
+                tag: "simpuskeswan-reminder"
+            });
+        } catch (e) {
+            console.error("Gagal menampilkan notifikasi:", e);
+        }
+    } else if (Notification.permission !== "denied") {
+        Notification.requestPermission().then(permission => {
+            if (permission === "granted") {
+                new Notification(title, { body: bodyText });
+            }
+        });
+    }
+}
 </script>
+<!-- Penampung Toast Notification -->
+<div id="toast-container" class="fixed bottom-5 right-5 z-50 flex flex-col gap-2 pointer-events-none"></div>
 </body>
 </html>
