@@ -1213,21 +1213,30 @@ function escapeHtml(val){
 // diubah/dihapus siapa pun lewat aplikasi (lihat firestore.rules) - khusus
 // Admin yang bisa membacanya di menu Log Aktivitas.
 async function catatAudit(aksi, koleksi, docId, ringkasan){
-  try{
-    await db.collection('audit_log').add({
-      waktu: firebase.firestore.FieldValue.serverTimestamp(),
-      uid: currentUser?.uid || '-',
-      nama: currentProfile?.nama || currentUser?.email || '-',
-      email: currentUser?.email || '-',
-      aksi, // 'tambah' | 'ubah' | 'hapus'
-      koleksi,
-      docId: docId || '-',
-      ringkasan: ringkasan || '-'
-    });
-  }catch(err){
-    // Jangan sampai gagal mencatat log menggagalkan aksi utama pengguna
-    console.warn('Gagal mencatat audit log:', err.message);
-  }
+    try{
+        await db.collection('audit_log').add({
+            waktu: firebase.firestore.FieldValue.serverTimestamp(),
+            uid: currentUser?.uid || '-',
+            nama: currentProfile?.nama || currentUser?.email || '-',
+            email: currentUser?.email || '-',
+            aksi, // 'tambah' | 'ubah' | 'hapus'
+            koleksi,
+            docId: docId || '-',
+            ringkasan: ringkasan || '-'
+        });
+
+        // Notifikasi Toast otomatis untuk seluruh menu entri data
+        let pesanToast = "Aksi berhasil disimpan!";
+        if(aksi === 'tambah') pesanToast = "Data baru berhasil ditambahkan!";
+        else if(aksi === 'ubah') pesanToast = "Data berhasil diperbarui!";
+        else if(aksi === 'hapus') pesanToast = "Data berhasil dihapus!";
+        
+        showToast(pesanToast, "success");
+
+    }catch(err){
+        // Jangan sampai gagal mencatat log menggagalkan aksi utama
+        console.warn('Gagal mencatat audit log:', err.message);
+    }
 }
 function roleBadge(role){
   if(role === 'Medik Veteriner') return `<span class="badge badge-vet">Dokter Hewan</span>`;
