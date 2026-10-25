@@ -1185,11 +1185,26 @@ const db = firebase.firestore();
    2. HELPER UMUM
 ========================================================= */
 function showToast(msg, isErr=false){
-  const t = document.getElementById('toast');
-  t.textContent = msg;
-  t.classList.toggle('err', isErr);
-  t.classList.add('show');
-  setTimeout(()=>t.classList.remove('show'), 2600);
+    let container = document.getElementById('toast-container');
+    if (!container) {
+        container = document.createElement('div');
+        container.id = 'toast-container';
+        container.className = 'fixed bottom-5 right-5 z-50 flex flex-col gap-2 pointer-events-none';
+        document.body.appendChild(container);
+    }
+    
+    let box = document.createElement('div');
+    box.innerText = msg;
+    box.className = "pointer-events-auto text-white px-4 py-3 rounded-lg shadow-xl text-sm font-medium transition-all duration-300 transform translate-y-2 opacity-0";
+    box.style.backgroundColor = isErr ? '#EF4444' : '#10B981';
+    
+    container.appendChild(box);
+    
+    setTimeout(() => { box.classList.remove('translate-y-2', 'opacity-0'); }, 10);
+    setTimeout(() => {
+        box.classList.add('translate-y-2', 'opacity-0');
+        setTimeout(() => box.remove(), 300);
+    }, 2600);
 }
 function fmtDate(d){
   if(!d) return '-';
@@ -4662,7 +4677,7 @@ function sendDesktopNotification(title, bodyText) {
             if (permission === "granted") {
                 new Notification(title, { body: bodyText });
             }
-        }); 
+        });
     }
 }
 </script>
