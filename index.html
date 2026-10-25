@@ -1184,27 +1184,33 @@ const db = firebase.firestore();
 /* =========================================================
    2. HELPER UMUM
 ========================================================= */
-function showToast(msg, isErr=false){
+function showToast(msg, isErr = false) {
     let container = document.getElementById('toast-container');
     if (!container) {
         container = document.createElement('div');
         container.id = 'toast-container';
-        container.className = 'fixed bottom-5 right-5 z-50 flex flex-col gap-2 pointer-events-none';
+        container.style.cssText = "position:fixed; bottom:20px; right:20px; z-index:99999; display:flex; flex-direction:column; gap:8px; pointer-events:none;";
         document.body.appendChild(container);
     }
     
     let box = document.createElement('div');
     box.innerText = msg;
-    box.className = "pointer-events-auto text-white px-4 py-3 rounded-lg shadow-xl text-sm font-medium transition-all duration-300 transform translate-y-2 opacity-0";
-    box.style.backgroundColor = isErr ? '#EF4444' : '#10B981';
+    box.style.cssText = `pointer-events:auto; color:white; padding:12px 20px; border-radius:8px; font-size:14px; font-weight:500; box-shadow:0 10px 25px rgba(0,0,0,0.3); background-color:${isErr ? '#EF4444' : '#10B981'}; transition:all 0.3s ease; opacity:0; transform:translateY(10px);`;
     
     container.appendChild(box);
     
-    setTimeout(() => { box.classList.remove('translate-y-2', 'opacity-0'); }, 10);
+    // Picu animasi muncul
     setTimeout(() => {
-        box.classList.add('translate-y-2', 'opacity-0');
+        box.style.opacity = '1';
+        box.style.transform = 'translateY(0)';
+    }, 10);
+    
+    // Hilang otomatis setelah 3 detik
+    setTimeout(() => {
+        box.style.opacity = '0';
+        box.style.transform = 'translateY(10px)';
         setTimeout(() => box.remove(), 300);
-    }, 2600);
+    }, 3000);
 }
 function fmtDate(d){
   if(!d) return '-';
