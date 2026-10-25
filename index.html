@@ -1533,16 +1533,31 @@ document.getElementById('modal-save').addEventListener('click', async ()=>{
     btn.textContent = 'Menyimpan...';
     btn.disabled = true;
     try{
-      await modalOnSave();
-    }catch(err){
-      showToast('Gagal menyimpan: ' + err.message, true);
-    }finally{
-      btn.textContent = originalText;
-      btn.disabled = false;
-    }
-  }
-});
+    await modalOnSave();
+    showToast('Data berhasil disimpan!'); // <-- Tambahkan notifikasi sukses di sini
+}catch(err){
+    showToast('Gagal menyimpan: ' + err.message, true); 
+}finally{
+    btn.textContent = originalText;
+    btn.disabled = false;
+}
+      // ==========================================
+// 2. HELPER UMUM
+// ==========================================
 
+function showToast(msg, isErr=false){
+    const t = document.getElementById('toast');
+    if (!t) return;
+    t.textContent = msg;
+    t.classList.toggle('err', isErr);
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 2600);
+}
+
+function fmtDate(d){
+    if(!d) return '-';
+    // ... sisa kode helper lainnya ...
+}
 /* =========================================================
    6. DATA PEMILIK & HEWAN (otomatis dari form Pelayanan/Vaksinasi)
    Menu Data Pemilik / Data Hewan sudah digabung ke dalam form entri.
